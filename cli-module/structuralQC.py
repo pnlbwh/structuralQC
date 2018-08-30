@@ -1,11 +1,8 @@
-# TODO: Specify the interpreter here
+#!/usr/bin/python
 
 from plumbum import cli
 from calculation import processImg
-import sys, os
 
-# /structuralQC/ should be added to PATH
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 class QC(cli.Application):
 

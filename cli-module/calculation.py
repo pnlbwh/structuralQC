@@ -8,6 +8,8 @@ import os
 import pandas as pd
 
 # global configurations ---------------------------------------
+# get structuralQC directory
+moduleDir= os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 eps = 2.2204e-16 # a small number to prevent divide by zero
 
 config = configparser.ConfigParser()
@@ -181,13 +183,13 @@ def processImage(imgPath, maskPath, directory, modality):
 
 def predictQuality(dim, H1, m1, modality, fid):
 
-    excelFile= config['TRAINING']['visual_qc_excel_file']
+    excelFile= os.path.join(moduleDir, config['TRAINING']['visual_qc_excel_file'])
     subjects, ratings= loadExcel(excelFile, modality)
 
     # load reference histogram file
-    H2= np.load(config['TRAINING'][modality+'Histogram'])
+    H2= np.load(os.path.join(moduleDir, config['TRAINING'][modality+'Histogram']))
 
-    maskFolder= config['TRAINING']['maskFolder']
+    maskFolder= os.path.join(moduleDir, config['TRAINING']['maskFolder'])
     maskSuffix= config['TRAINING'][f'{modality}MaskSuffix']
 
 
