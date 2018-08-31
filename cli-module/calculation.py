@@ -6,6 +6,7 @@ from registration import registration
 from masking import masking
 import os
 import pandas as pd
+import distutils.spawn
 
 # global configurations ---------------------------------------
 # get structuralQC directory
@@ -13,6 +14,7 @@ moduleDir= os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 eps = 2.2204e-16 # a small number to prevent divide by zero
 
 config = configparser.ConfigParser()
+config.read('config.ini')
 nx = int(config['DEFAULT']['nx'])
 ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])
@@ -59,6 +61,21 @@ def loadFiles(filePath):
         exit(1)
 
     return img
+
+
+def loadExecutables():
+    apps = ['Slicer', 'BRAINSROIAuto', 'antsRegistration']
+    for exe in apps:
+        sys.path.append(config['EXECUTABLES'][exe])
+
+        if distutils.spawn.find_executable(exe) is None:
+            print(f'{exe} could not be found')
+            print(f'Set {exe} path in structuralQC/config.ini and retry')
+            exit(1)
+        else:
+            print(f'{exe} found')
+
+    print('All executables are found, QC will begin now ...')
 
 
 def extract_feature(volume):
@@ -135,6 +152,8 @@ def loadExcel(fileName, modality):
 
 def processImage(imgPath, maskPath, directory, modality):
 
+    loadExecutables()
+
     # for debugging
     print(imgPath)
 
@@ -146,6 +165,8 @@ def processImage(imgPath, maskPath, directory, modality):
 
     # check if 'reg' keyword exists in prefix, if not then register to fixedImage
     if 'reg' not in prefix:
+        print('''\'reg\' keyword is not present in input image. 
+                    Registering with reference image ...''')
         if modality=='t1':
             regPath = registration(directory, prefix, fixedImaget1, imgPath)
         else:
@@ -159,10 +180,12 @@ def processImage(imgPath, maskPath, directory, modality):
 
         potentialMasks= len(glob.glob(directory, '*fore-mask*'))
         if potentialMasks>1:
-            print('Multiple foreground mask exists. Delete all but one and try again')
+            print('Multiple foreground mask exists in input image directory (default).'
+                  'Delete all but one and try again')
             exit(1)
 
         elif potentialMasks==0:
+            print('Creating mask ...')
             # create the foreground mask
             maskPath= masking(directory, prefix, imgPath)
 
@@ -246,8 +269,4 @@ def predictQuality(dim, H1, m1, modality, fid):
     fid.close()
 
     return predicted_score
-
-
-
-
 

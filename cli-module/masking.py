@@ -1,14 +1,14 @@
 import os
-from subprocess import check_output
+from subprocess import check_output, call
 
 def forgroundMask(directory, prefix, registeredImage):
 
-    # import distutils.spawn
-    # foreground_masking_cli = distutils.spawn.find_executable("BRAINSROIAuto")
     mask= os.path.join(directory, prefix+'-fore-mask'+'.nii.gz')
 
     try:
-        args = ['BRAINSROIAuto'
+        # Command line call:
+        # /home/tb571/Downloads/Slicer-4.9.0-2018-08-13-linux-amd64/Slicer --launch ./lib/Slicer-4.9/cli-modules/BRAINSROIAuto -h
+        args = ['Slicer', '--launch', 'BRAINSROIAuto'
                 '--inputVolume', registeredImage,
                 '--outputVolumePixelType', 'uint',
                 '--otsuPercentileThreshold', '0.21',
