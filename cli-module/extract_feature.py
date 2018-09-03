@@ -1,11 +1,14 @@
 import numpy as np
+import configparser
+config = configparser.ConfigParser()
+config.read('config.ini')
+POINTS= int(config['DEFAULT']['POINTS'])
 
 def extract_feature(volume):
 
     volume= volume.flatten( )
 
     sig = np.median(abs(volume - np.median(volume))) / 0.6745
-
 
     N = len(volume)
     # Estimate bandwidth

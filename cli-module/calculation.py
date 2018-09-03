@@ -2,11 +2,13 @@ import configparser
 import numpy as np
 from scipy.stats import pearsonr
 import glob
+
+import os
+
 from registration import registration
 from masking import masking
-import os
-import pandas as pd
-import distutils.spawn
+from extract_feature import extract_feature
+from loadFile import loadFile, loadExcel, loadExecutable
 
 # global configurations ---------------------------------------
 # get structuralQC directory
@@ -26,7 +28,6 @@ sz = int(config['DEFAULT']['sz'])
 decisionFactor= int(config['DEFAULT']['decisionFactor'])
 
 eta = float(config['DEFAULT']['eta'])
-POINTS= int(config['DEFAULT']['POINTS'])
 metric= config['DEFAULT']['metric']
 
 discreteScores = [int(x) for x in config['TRAINING']['discreteScores'].split(',')]
@@ -34,102 +35,6 @@ fixedImaget1= config['TRAINING']['fixedImaget1']
 fixedImaget2= config['TRAINING']['fixedImaget2']
 
 # ----------------------------------------------------------------
-
-import nrrd
-import warnings
-with warnings.catch_warnings():
-    warnings.filterwarnings("ignore", category=FutureWarning)
-    import nibabel
-
-def loadNrrd(fileName):
-    img = nrrd.read(fileName)
-    return img[0]
-
-def loadNifti(fileName):
-    img = nibabel.load(fileName)
-    return img.get_data()
-
-def loadFiles(filePath):
-
-    if filePath.endswith('.nii') or filePath.endswith('.nii.gz'):
-        img= loadNrrd(filePath)
-    elif filePath.endswith('.nrrd') or ('.nhdr'):
-        img= loadNifti(filePath)
-
-    else:
-        print('Invalid file format, accepted formats: nii, nii.gz, nrrd, and nhdr')
-        exit(1)
-
-    return img
-
-
-def loadExecutables():
-    apps = ['Slicer', 'BRAINSROIAuto', 'antsRegistration']
-    for exe in apps:
-        sys.path.append(config['EXECUTABLES'][exe])
-
-        if distutils.spawn.find_executable(exe) is None:
-            print(f'{exe} could not be found')
-            print(f'Set {exe} path in structuralQC/config.ini and retry')
-            exit(1)
-        else:
-            print(f'{exe} found')
-
-    print('All executables are found, QC will begin now ...')
-
-
-def extract_feature(volume):
-
-    volume= volume.flatten( )
-
-    sig = np.median(abs(volume - np.median(volume))) / 0.6745
-
-    N = len(volume)
-    # Estimate bandwidth
-    if sig > 0:
-        h = sig * (4 / (3 * N)) ** 0.2
-    else:
-        h = 1
-
-    # Calculate data points where we want to find ksdensity estimate
-    e1 = volume.min() - h * 3
-    e2 = volume.max() + h * 3
-
-    x = np.linspace(e1, e2, POINTS)
-    x = np.array(x).reshape(1, POINTS)
-
-    volume = np.array(volume).reshape(len(volume), 1)
-    volumeMatrix = np.repeat(volume, POINTS, axis=1)
-    temp = (x - volumeMatrix) / h
-    Z = np.sum(np.exp(-0.5 * temp ** 2), axis=0)
-
-    final = Z / sum(Z)
-
-    return final
-
-
-def slide_filter(mri, histName):
-
-    X, Y, Z = np.shape(mri)
-
-    G = np.zeros((1, X//(nx*sx), Y//(ny*sy), Z//(nz*sz), POINTS), dtype=float)
-
-
-    for i in range(0, X, nx*sx):
-        for j in range(0, Y, ny*sy):
-            for k in range(0, Z, nz*sz):
-
-                patch = mri[i:i + nx, j:j + ny, k:k + nz]
-
-                if patch.max():
-                    G[0, i // nx, j // ny, k // nz, :] = extract_feature(patch)
-
-    if histName:
-        np.save(histName, G)
-
-    # return provides a way to make a larger matrix from different subjects
-    return G
-
 
 def BC(P, Q):
     return -np.log(np.sum([np.sqrt(P[i]*Q[i]) for i in range(len(P))]))
@@ -140,19 +45,13 @@ def KL(P, Q):
     return np.sum([P[i]*np.log(P[i]/Q[i]) for i in range(len(P))])
 
 
-def loadExcel(fileName, modality):
-
-    df = pd.read_excel(fileName)
-    subjects= df["Subject ID"].values
-    ratings= df[modality+" score"].values
-
-    return (subjects, ratings)
-
-
-
 def processImage(imgPath, maskPath, directory, modality):
-
-    loadExecutables()
+    
+    apps = ['Slicer', 'BRAINSROIAuto', 'antsRegistration']
+    for exe in apps:
+        loadExecutable(exe)
+    
+    print('All executables are found, program will begin now ...')
 
     # for debugging
     print(imgPath)
@@ -191,8 +90,8 @@ def processImage(imgPath, maskPath, directory, modality):
 
 
     # load the mri and the mask
-    mri= loadFiles(regPath)
-    mask= loadFiles(maskPath)
+    mri= loadFile(regPath)
+    mask= loadFile(maskPath)
 
     # extract feature from the mri
     histName = os.path.join(directory, prefix + '-histogram' + '.npy')
@@ -227,7 +126,7 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         for m in ind: # reference subjects
 
-            m2= loadFiles(os.path.join(maskFolder, subjects[m]+ maskSuffix)) # reference mask
+            m2= loadFile(os.path.join(maskFolder, subjects[m]+ maskSuffix)) # reference mask
 
             for i in range(0, X, sx*nx):
                 for j in range(0, Y, sy*ny):

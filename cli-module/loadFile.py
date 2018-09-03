@@ -1,9 +1,11 @@
 import nrrd
-
 import warnings
 with warnings.catch_warnings():
     warnings.filterwarnings("ignore", category=FutureWarning)
     import nibabel
+    
+import distutils.spawn
+import pandas as pd
 
 def loadNrrd(fileName):
     img = nrrd.read(fileName)
@@ -13,4 +15,35 @@ def loadNifti(fileName):
     img = nibabel.load(fileName)
     return img.get_data()
 
+def loadFile(filePath):
 
+    if filePath.endswith('.nii') or filePath.endswith('.nii.gz'):
+        img= loadNrrd(filePath)
+    elif filePath.endswith('.nrrd') or ('.nhdr'):
+        img= loadNifti(filePath)
+
+    else:
+        print('Invalid file format, accepted formats: nii, nii.gz, nrrd, and nhdr')
+        exit(1)
+
+    return img
+    
+def loadExcel(fileName, modality):
+
+    df = pd.read_excel(fileName)
+    subjects= df["Subject ID"].values
+    ratings= df[modality+" score"].values
+
+    return (subjects, ratings)
+    
+    
+def loadExecutable(exe):
+    
+    sys.path.append(config['EXECUTABLES'][exe])
+
+    if distutils.spawn.find_executable(exe) is None:
+        print(f'{exe} could not be found')
+        print(f'Set {exe} path in config.ini and retry')
+        exit(1)
+    else:
+        print(f'{exe} found')        

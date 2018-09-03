@@ -2,18 +2,18 @@ import numpy as np
 import configparser
 from extract_feature import extract_feature
 
-def slide_filter(mri):
+config = configparser.ConfigParser()
+nx = config['DEFAULT']['nx']
+ny = config['DEFAULT']['ny']
+nz = config['DEFAULT']['nz']
 
-    config = configparser.ConfigParser()
-    nx = config['DEFAULT']['nx']
-    ny = config['DEFAULT']['ny']
-    nz = config['DEFAULT']['nz']
+sx = config['DEFAULT']['sx']
+sy = config['DEFAULT']['sy']
+sz = config['DEFAULT']['sz']
 
-    sx = config['DEFAULT']['sx']
-    sy = config['DEFAULT']['sy']
-    sz = config['DEFAULT']['sz']
+POINTS= config['DEFAULT']['POINTS']
 
-    POINTS= config['DEFAULT']['POINTS']
+def slide_filter(mri, histName):
 
     X, Y, Z = np.shape(mri)
 
@@ -29,5 +29,8 @@ def slide_filter(mri):
                 if patch.max():
                     G[0, i // nx, j // ny, k // nz, :] = extract_feature(patch)
 
+    if histName:
+        np.save(histName, G)
 
+    # return provides a way to make a larger matrix from different subjects
     return G
