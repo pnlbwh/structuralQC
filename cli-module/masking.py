@@ -1,9 +1,9 @@
 import os
 from subprocess import check_output, call
 
-def foregroundMask(directory, prefix, registeredImage):
+def foregroundMask(directory, prefix, registeredImage, modality):
 
-    mask= os.path.join(directory, prefix+'-fore-mask'+'.nii.gz')
+    mask= os.path.join(directory, prefix+ modality+ '-fore-mask'+ '.nii.gz')
 
     try:
         # Command line call:

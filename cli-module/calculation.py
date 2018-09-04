@@ -8,7 +8,7 @@ import os, sys
 from registration import registration
 from masking import foregroundMask
 from extract_feature import extract_feature
-from loadFile import loadFile, loadExcel, loadExecutable
+from loadFile import loadImage, loadExcel
 from slide_filter import slide_filter
 
 # global configurations ---------------------------------------
@@ -47,13 +47,6 @@ def KL(P, Q):
 
 
 def processImage(imgPath, maskPath, directory, modality):
-    
-    apps = ['Slicer', 'antsRegistration', 'BRAINSROIAuto']
-    for exe in apps:
-        os.environ["PATH"]+= ':'+os.path.abspath(config['EXECUTABLES'][exe])
-        loadExecutable(exe)
-    
-    print('All executables are found, program will begin now ...')
 
     # for debugging
     print(imgPath)
@@ -74,13 +67,13 @@ def processImage(imgPath, maskPath, directory, modality):
             regPath = registration(directory, prefix, fixedImaget2, imgPath)
     else:
         regPath= imgPath
-        print('Registered image found ...');
+        print('Registered image found ...')
 
 
     # if mask not provided, check for 'fore-mask' keyword in input directory, if not then create foreground mask
     if maskPath=='None':
 
-        potentialMask= glob.glob(os.path.join(directory, '*fore-mask*'))
+        potentialMask= glob.glob(os.path.join(directory, f'*{modality}*fore-mask*'))
         num= len(potentialMask)
         if num>1:
             print('Multiple foreground mask exists in input image directory (default).'
@@ -90,7 +83,7 @@ def processImage(imgPath, maskPath, directory, modality):
         elif num==0:
             print('Creating mask ...')
             # create the foreground mask
-            maskPath= foregroundMask(directory, prefix, imgPath)
+            maskPath= foregroundMask(directory, prefix, imgPath, modality)
         
         else:
             maskPath= potentialMask[0]
@@ -98,8 +91,8 @@ def processImage(imgPath, maskPath, directory, modality):
 
 
     # load the mri and the mask
-    mri= loadFile(regPath)
-    mask= loadFile(maskPath)
+    mri= loadImage(regPath)
+    mask= loadImage(maskPath)
 
     # extract feature from the mri
     histName = os.path.join(directory, prefix + '-histogram' + '.npy')
@@ -108,14 +101,16 @@ def processImage(imgPath, maskPath, directory, modality):
     dim= np.shape(mri)
 
     fid= open(os.path.join(directory, prefix + '-quality' + '.txt'), 'w')
-    predictQuality(dim, H_test, mask, modality, fid)
 
+    prediction= predictQuality(dim, H_test, mask, modality, fid)
+
+    return prediction
 
 def predictQuality(dim, H1, m1, modality, fid):
 
     excelFile= os.path.join(moduleDir, config['TRAINING']['visual_qc_excel_file'])
     subjects, ratings= loadExcel(excelFile, modality)
-    subjects= [str(i) for i in subjects]
+    
     
     # load reference histogram file
     H2= np.load(os.path.join(moduleDir, config['TRAINING'][modality+'Histogram']))
@@ -135,7 +130,7 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         for m in ind: # reference subjects
 
-            m2= loadFile(os.path.join(maskFolder, subjects[m], subjects[m] + maskSuffix)) # reference mask
+            m2= loadImage(os.path.join(maskFolder, subjects[m], subjects[m] + maskSuffix)) # reference mask
 
             for i in range(0, X, sx*nx):
                 for j in range(0, Y, sy*ny):
@@ -167,7 +162,7 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         class_score[s-1]= temp.sum()/counter
 
-    predicted_score= np.argmax(class_score)
+    predicted_score= discreteScores[np.argmax(class_score)]
 
     # for debugging
     print(predicted_score)

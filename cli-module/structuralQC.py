@@ -2,7 +2,8 @@
 
 from plumbum import cli
 from calculation import processImage
-
+from loadFile import loadExecutable
+import os, configparser
 
 class QC(cli.Application):
 
@@ -48,6 +49,8 @@ class QC(cli.Application):
         if self.modality != 't1' and self.modality != 't2':
             print('Invalid structural mri, valid types: t1/t2')
             exit(1)
+
+        loadExternalCommands()
 
         processImage(self.img, self.mask, self.outDir, self.modality)
 
