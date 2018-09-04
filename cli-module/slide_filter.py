@@ -1,17 +1,19 @@
 import numpy as np
 import configparser
 from extract_feature import extract_feature
+import os
 
 config = configparser.ConfigParser()
-nx = config['DEFAULT']['nx']
-ny = config['DEFAULT']['ny']
-nz = config['DEFAULT']['nz']
+config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+nx = int(config['DEFAULT']['nx'])
+ny = int(config['DEFAULT']['ny'])
+nz = int(config['DEFAULT']['nz'])
 
-sx = config['DEFAULT']['sx']
-sy = config['DEFAULT']['sy']
-sz = config['DEFAULT']['sz']
+sx = int(config['DEFAULT']['sx'])
+sy = int(config['DEFAULT']['sy'])
+sz = int(config['DEFAULT']['sz'])
 
-POINTS= config['DEFAULT']['POINTS']
+POINTS= int(config['DEFAULT']['POINTS'])
 
 def slide_filter(mri, histName):
 
@@ -27,7 +29,7 @@ def slide_filter(mri, histName):
                 patch = mri[i:i + nx, j:j + ny, k:k + nz]
 
                 if patch.max():
-                    G[0, i // nx, j // ny, k // nz, :] = extract_feature(patch)
+                    G[0, i // (nx*sx), j // (ny*sy), k // (nz*sz), :] = extract_feature(patch)
 
     if histName:
         np.save(histName, G)

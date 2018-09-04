@@ -1,16 +1,15 @@
 import os
-from subprocess import check_output, call
+from subprocess import check_call, call
 
 def registration(directory, prefix, fixedImage, movingImage):
 
-    # import distutils.spawn
-    # registration_cli = distutils.spawn.find_executable("antsRegistration")
-    reg= os.path.join(directory, prefix+'-reg'+'.nii.gz')
+    regImage= os.path.join(directory, prefix+'-reg'+'.nii.gz')
 
-    imgs= fixedImage,movingImage
-
+    imgs= f'{fixedImage}, {movingImage}'
+    
     try:
-        args = ['antsRegistration', '-d' '3', '-r' f'[{imgs}, 1]',
+        # antsRegistration doesn't work without (' ').join
+        args = (' ').join(['antsRegistration', '-d', '3', '-r', f'[{imgs}, 1]',
                 '-m', f'mattes[{imgs}, 1, 32, regular, 0.1]',
                 '-t', 'affine[0.1]',
                 '-c', '[500x500x50, 1e-3, 20]',
@@ -20,14 +19,20 @@ def registration(directory, prefix, fixedImage, movingImage):
                 '-l', '1',
                 '-z', '1',
                 '-o', f'[{prefix}, {prefix}-reg.nii.gz]'
-                ]
-        check_output(args)
+                ])
+              
+        # print(args)
+        
+        # for antsRegistration, shell= True is a must
+        check_call(args, shell= True)
 
         call(['rm', f'{prefix}0GenericAffine.mat'])
-        call(['mv', f'${prefix}-reg.nii.gz', directory])
-
+        call(['mv', f'{prefix}-reg.nii.gz', directory])
+        
     except:
         print("Registration failed")
         exit(1)
-
-    return reg
+    
+    print("Registration successful")
+    return regImage
+    

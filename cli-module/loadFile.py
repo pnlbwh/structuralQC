@@ -6,6 +6,7 @@ with warnings.catch_warnings():
     
 import distutils.spawn
 import pandas as pd
+import sys
 
 def loadNrrd(fileName):
     img = nrrd.read(fileName)
@@ -18,9 +19,9 @@ def loadNifti(fileName):
 def loadFile(filePath):
 
     if filePath.endswith('.nii') or filePath.endswith('.nii.gz'):
-        img= loadNrrd(filePath)
-    elif filePath.endswith('.nrrd') or ('.nhdr'):
         img= loadNifti(filePath)
+    elif filePath.endswith('.nrrd') or ('.nhdr'):
+        img= loadNrrd(filePath)
 
     else:
         print('Invalid file format, accepted formats: nii, nii.gz, nrrd, and nhdr')
@@ -38,8 +39,6 @@ def loadExcel(fileName, modality):
     
     
 def loadExecutable(exe):
-    
-    sys.path.append(config['EXECUTABLES'][exe])
 
     if distutils.spawn.find_executable(exe) is None:
         print(f'{exe} could not be found')

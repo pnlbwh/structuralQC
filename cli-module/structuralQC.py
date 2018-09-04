@@ -1,7 +1,7 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from plumbum import cli
-from calculation import processImg
+from calculation import processImage
 
 
 class QC(cli.Application):
@@ -18,7 +18,7 @@ class QC(cli.Application):
 
     modality= cli.SwitchAttr(
             ['-t', '--type'],
-            help= 'T1/T2',
+            help= 't1/t2',
             mandatory= True)
 
     mask = cli.SwitchAttr(
@@ -44,12 +44,12 @@ class QC(cli.Application):
         self.mask= str(self.mask)
         self.outDir= str(self.outDir)
         self.modality= self.modality.lower()
-
-        if self.modality != 't1' or self.modality != 't2':
+        
+        if self.modality != 't1' and self.modality != 't2':
             print('Invalid structural mri, valid types: t1/t2')
             exit(1)
 
-        processImg(self.img, self.mask, self.outDir, self.modality)
+        processImage(self.img, self.mask, self.outDir, self.modality)
 
 if __name__ == '__main__':
     QC.run()
