@@ -3,7 +3,7 @@
 from plumbum import cli
 from calculation import processImage
 from loadFile import loadExecutable, loadExternalCommands
-import os, configparser
+import time
 
 class QC(cli.Application):
 
@@ -43,7 +43,6 @@ class QC(cli.Application):
 
         self.img= str(self.img)
         self.mask= str(self.mask)
-        self.outDir= str(self.outDir)
         self.modality= self.modality.lower()
         
         if self.modality != 't1' and self.modality != 't2':
@@ -52,7 +51,10 @@ class QC(cli.Application):
 
         loadExternalCommands()
 
+        t1= time.time()
         processImage(self.img, self.mask, self.outDir, self.modality)
+        print(f'Time taken in structural QC {time.time()-t1} seconds')
+
 
 if __name__ == '__main__':
     QC.run()

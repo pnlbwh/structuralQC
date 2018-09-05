@@ -1,21 +1,22 @@
-# !/usr/bin/env python
+#!/usr/bin/env python
 
 from plumbum import cli
 from feature_represent import feature_represent
 from loadFile import loadExternalCommands
-import os, configparser
 
 
 class Training(cli.Application):
     """Extracts features from all the images in a directory.
-    Registers the images to a reference image, creates foreground mask
-    of the reference image, and calculates intensity histogram
-    of non zero patches in the registered image.
+    Registers the images to a reference image, creates foreground
+    mask of the reference image, and calculates intensity histogram of
+    non zero patches in the registered image. Edit the INPUT section
+    of structuralQC/config.ini file before running this application
     """
 
     register= cli.Flag(
         ['-r', '--registerImage'],
-        help= 'Turn on this flag for registering input images to the reference image',
+        help= '''Use this option for registering input images to the reference image, 
+               specify the reference image.''',
         mandatory= False,
         default= False)
 
@@ -26,8 +27,8 @@ class Training(cli.Application):
         default= False)
 
     hist= cli.Flag(
-        ['-h', '--hist'],
-        help= 'Turn on this flag for obtaining histogram of registered image',
+        ['-f', '--feature'],
+        help= 'Turn on this flag for obtaining histogram feature of registered image',
         mandatory= False,
         default= False)
 
@@ -35,26 +36,21 @@ class Training(cli.Application):
         ['-o', '--out'],
         help='''output directory (default: input image directory)
                 where feature histograms, registered images, 
-                and foreground masks are saved.
-                ''',
+                and foreground masks are saved.''',
         mandatory=False)
 
     def main(self):
 
-        self.modality = self.modality.lower()
-
-        if self.modality != 't1' and self.modality != 't2':
-            print('Invalid structural mri, valid types: t1/t2')
-            exit(1)
-
         loadExternalCommands()
-        
-        if self.register or self.create or self.hist:
+
+
+        if self.register!=None or self.create or self.hist:
             feature_represent(self.register, self.create, self.hist, self.outDir)
         else:
             print('None of the training options has been selected, turn on at least one of the flags.')
             exit(1)
-            
+
+        pass
 
 if __name__ == '__main__':
     Training.run()

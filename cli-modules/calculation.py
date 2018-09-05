@@ -2,17 +2,20 @@ import configparser
 import numpy as np
 from scipy.stats import pearsonr
 import glob
+import ast
 
-import os, sys
+import os
 
 from registration import registration
 from masking import foregroundMask
-from extract_feature import extract_feature
 from loadFile import loadImage, loadExcel
 from slide_filter import slide_filter
 
 # global configurations ---------------------------------------
 # get structuralQC directory
+
+# TODO: moduleDir usage should be ommited, come up with better design
+
 moduleDir= os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 eps = 2.2204e-16 # a small number to prevent divide by zero
 
@@ -31,7 +34,7 @@ decisionFactor= int(config['DEFAULT']['decisionFactor'])
 eta = float(config['DEFAULT']['eta'])
 metric= config['DEFAULT']['metric']
 
-discreteScores = [int(x) for x in config['TRAINING']['discreteScores'].split(',')]
+discreteScores = ast.literal_eval(config['TRAINING']['discreteScores'])
 fixedImaget1= os.path.join(moduleDir, config['TRAINING']['fixedImaget1'])
 fixedImaget2= os.path.join(moduleDir, config['TRAINING']['fixedImaget2'])
 
@@ -52,8 +55,10 @@ def processImage(imgPath, maskPath, directory, modality):
     print(imgPath)
 
     # Determine prefix and directory
-    if directory == 'None':
+    if not directory:
         directory = os.path.dirname(os.path.abspath(imgPath))
+    elif not os.path.exists(directory):
+        os.makedirs(directory)
 
     prefix = os.path.basename(imgPath).split('.')[0]
 
@@ -162,7 +167,10 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         class_score[s-1]= temp.sum()/counter
 
-    predicted_score= discreteScores[np.argmax(class_score)]
+    if metric == 'PEARSON':
+        predicted_score= discreteScores[np.argmax(class_score)]
+    else:
+        predicted_score= discreteScores[np.argmin(class_score)]
 
     # for debugging
     print(predicted_score)
@@ -173,3 +181,11 @@ def predictQuality(dim, H1, m1, modality, fid):
 
     return predicted_score
 
+def main():
+    pass
+    # test the algorithm on a test image
+    processImage()
+
+
+if __name__== '__main__':
+    main()
