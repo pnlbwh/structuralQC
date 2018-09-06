@@ -16,12 +16,9 @@ nx = int(config['DEFAULT']['nx'])
 ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])
 
-sx = int(config['DEFAULT']['sx'])
-sy = int(config['DEFAULT']['sy'])
-sz = int(config['DEFAULT']['sz'])
-
 POINTS= int(config['DEFAULT']['POINTS'])
 
+'''
 config_input = configparser.ConfigParser()
 config_input.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config_input.ini')))
 imageFolder= config_input['INPUT']['imageFolder']
@@ -30,7 +27,7 @@ subFolder= config_input['INPUT']['subFolder']
 imageSuffix= config_input['INPUT']['imageSuffix']
 modality= config_input['INPUT']['modality']
 excelFile= config_input['INPUT']['visual_qc_excel_file']
-
+'''
 
 def subject_register(sub_name):
     print('Registering subject ', sub_name)
@@ -51,10 +48,14 @@ def subject_histogram(sub_name):
 
 
 
-def feature_represent(register, create, hist, directory):
+def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, register, create, hist, directory):
 
+    global imageFolder, subFolder, imageSuffix, modality, outDir
 
-    global outDir
+    imageFolder = imgDir
+    subFolder = subDir
+    imageSuffix = suffix
+    modality = type
 
     # Determine prefix and directory
     if not directory:
@@ -126,7 +127,7 @@ def feature_represent(register, create, hist, directory):
         mri= loadImage(os.path.join(imageFolder, subjects[0], subFolder, subjects[0]+imageSuffix))
         X, Y, Z= np.shape(mri)
 
-        H = np.zeros((num_sub, X//(nx*sx), Y//(ny*sy), Z//(nz*sz), POINTS), dtype=float)
+        H = np.zeros((num_sub, X//nx, Y//ny, Z//nz, POINTS), dtype=float)
 
         pool = multiprocessing.Pool()  # Use all available cores, otherwise specify the number you want as an argument
 

@@ -144,8 +144,8 @@ def predictQuality(dim, H1, m1, modality, fid):
                         p1 = m1[i:i + nx, j:j + ny, k:k + nz] # Test patch
                         p2 = m2[i:i + nx, j:j + ny, k:k + nz] # Reference patch
 
-                        P = H1[0, i // (nx*sx), j // (ny*sy), k // (nz*sz), :] # Test histogram
-                        Q = H2[m, i // (nx*sx), j // (ny*sy), k // (nz*sz), :] # Reference histogram
+                        P = H1[0, i // nx, j // ny, k // nz, :] # Test histogram
+                        Q = H2[m, i // nx, j // ny, k // nz, :] # Reference histogram
 
                         if p1.max() and p2.max() and np.multiply(P,Q).sum() and np.multiply(p1, p2).sum()> 0.5*eta*(p1.sum()+p2.sum()):
 
@@ -184,7 +184,7 @@ def predictQuality(dim, H1, m1, modality, fid):
 def main():
     pass
     # test the algorithm on a test image
-    processImage()
+    # processImage()
 
 
 if __name__== '__main__':

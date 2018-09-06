@@ -7,12 +7,13 @@ import multiprocessing
 import ast
 
 
-from loadFile import loadExcel, loadCaseList, loadExternalCommands
+from loadFile import loadExcel, loadCaseList
 from calculation import processImage
 from errorChecking import errorChecking, EXIT
 
 from sklearn.metrics import confusion_matrix
 
+'''
 config_input = configparser.ConfigParser()
 config_input.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config_input.ini')))
 imageFolder= config_input['INPUT']['imageFolder']
@@ -21,6 +22,7 @@ subFolder= config_input['INPUT']['subFolder']
 imageSuffix= config_input['INPUT']['imageSuffix']
 modality= config_input['INPUT']['modality']
 excelFile= config_input['INPUT']['visual_qc_excel_file']
+'''
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
@@ -36,7 +38,7 @@ def subject_prediction(sub):
     return prediction
 
 
-def resultEvaluation(subjects, predicted_scores, excelFile):
+def resultEvaluation(subjects, predicted_scores):
 
     # read the Subject ID and {modality} column
     cases, visual_scores= loadExcel(excelFile, modality)
@@ -52,11 +54,18 @@ def resultEvaluation(subjects, predicted_scores, excelFile):
 
 
 
-def main():
+def batchProcessing(imgDir, subDir, type,
+                    suffix, cases, xlsxFile):
 
-    t1= time.time()
+    global imageFolder, subFolder, modality, imageSuffix, caselist, excelFile
 
-    loadExternalCommands()
+    imageFolder= imgDir
+    subFolder= subDir
+    modality= type
+    imageSuffix= suffix
+    caselist= cases
+    excelFile= xlsxFile
+
 
     subjects = loadCaseList(caselist)
     num_sub = len(subjects)
@@ -69,8 +78,6 @@ def main():
 
     pool.close()
     pool.join()
-
-    print(f'Time taken in quality checking {time.time()-t1} seconds')
 
 
     df= pd.DataFrame({'Case #': subjects,
@@ -89,7 +96,11 @@ def main():
     '''
 
     if excelFile:
-        resultEvaluation(subjects, predicted_scores, excelFile)
+        resultEvaluation(subjects, predicted_scores)
+
+def main():
+    pass
+    # run test qc on a small set of images
 
 
 if __name__=="__main__":

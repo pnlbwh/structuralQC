@@ -43,14 +43,12 @@ class Training(cli.Application):
 
         loadExternalCommands()
 
-
         if self.register!=None or self.create or self.hist:
             feature_represent(self.register, self.create, self.hist, self.outDir)
         else:
             print('None of the training options has been selected, turn on at least one of the flags.')
             exit(1)
 
-        pass
 
 if __name__ == '__main__':
     Training.run()
