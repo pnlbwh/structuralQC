@@ -77,7 +77,7 @@ def batchProcessing(imgDir, subDir, type,
 
     if not subFolder:
         subFolder= '.'
-        
+
     subjects = loadCaseList(caselist)
     num_sub = len(subjects)
 

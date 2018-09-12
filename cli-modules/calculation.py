@@ -82,7 +82,11 @@ def processImage(imgPath, maskPath, directory, modality):
     # if mask not provided, check for '-fore-mask.nii.gz' keyword in input directory, if not then create foreground mask
     if maskPath=='None':
 
+        # take into account both upper and lower cases
         potentialMask= glob.glob(os.path.join(directory, f'*{modality}*-fore-mask.nii.gz'))
+        if not potentialMask:
+            potentialMask= glob.glob(os.path.join(directory, f'*{modality.upper()}*-fore-mask.nii.gz'))
+
         num= len(potentialMask)
         if num>1:
             print('Multiple foreground mask exists in input image directory (default).'
@@ -92,7 +96,7 @@ def processImage(imgPath, maskPath, directory, modality):
         elif num==0 or createMask:
             print('Creating mask ...')
             # create the foreground mask
-            maskPath= foregroundMask(directory, prefix, imgPath)
+            maskPath= foregroundMask(directory, prefix, regPath)
         
         else:
             maskPath= potentialMask[0]
