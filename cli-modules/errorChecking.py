@@ -3,6 +3,19 @@ def EXIT(msg):
     exit(1)
 
 
+def keyPrompt():
+
+    while 1:
+        sanity= input('[y/n] : ')
+        if sanity=='n':
+            EXIT('Program exiting ...')
+        elif sanity=='y':
+            print("Program will continue ...")
+            break
+        else:
+            continue
+
+
 def errorChecking(subjects, cases):
 
     # error checking

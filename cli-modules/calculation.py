@@ -60,12 +60,16 @@ def processImage(imgPath, maskPath, directory, modality):
     elif not os.path.exists(directory):
         os.makedirs(directory)
 
+
     prefix = os.path.basename(imgPath).split('.')[0]
 
+    createMask= False
     # check if 'reg' keyword exists in prefix, if not then register to fixedImage
     if 'reg' not in prefix:
         print('\'reg\' keyword is not present in input image. Registering with reference image ...')
-        
+
+        createMask= True # if registration is done, foreground mask must be recreated
+
         if modality=='t1':
             regPath = registration(directory, prefix, fixedImaget1, imgPath)
         else:
@@ -75,17 +79,17 @@ def processImage(imgPath, maskPath, directory, modality):
         print('Registered image found ...')
 
 
-    # if mask not provided, check for 'fore-mask' keyword in input directory, if not then create foreground mask
+    # if mask not provided, check for '-fore-mask.nii.gz' keyword in input directory, if not then create foreground mask
     if maskPath=='None':
 
-        potentialMask= glob.glob(os.path.join(directory, f'*{modality}*fore-mask*'))
+        potentialMask= glob.glob(os.path.join(directory, f'*{modality}*-fore-mask.nii.gz'))
         num= len(potentialMask)
         if num>1:
             print('Multiple foreground mask exists in input image directory (default).'
                   'Delete all but one and try again')
             exit(1)
 
-        elif num==0:
+        elif num==0 or createMask:
             print('Creating mask ...')
             # create the foreground mask
             maskPath= foregroundMask(directory, prefix, imgPath)
@@ -107,11 +111,13 @@ def processImage(imgPath, maskPath, directory, modality):
 
     fid= open(os.path.join(directory, prefix + '-quality' + '.txt'), 'w')
 
+    print("Checking quality ...")
     prediction= predictQuality(dim, H_test, mask, modality, fid)
 
     return prediction
 
 def predictQuality(dim, H1, m1, modality, fid):
+
 
     excelFile= os.path.join(moduleDir, config['TRAINING']['visual_qc_excel_file'])
     subjects, ratings= loadExcel(excelFile, modality)
@@ -127,7 +133,7 @@ def predictQuality(dim, H1, m1, modality, fid):
     class_score= np.zeros(len(discreteScores), dtype= float)
 
     X, Y, Z= dim
-    for s in discreteScores:
+    for l, s in enumerate(discreteScores):
 
         ind= np.where(ratings==s)[0]
         temp = np.zeros(int((len(ind) * X / nx * Y / ny * Z / nz)/(sx*sy*sz)), dtype=float)
@@ -135,7 +141,7 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         for m in ind: # reference subjects
 
-            m2= loadImage(os.path.join(maskFolder, subjects[m], subjects[m] + maskSuffix)) # reference mask
+            m2 = loadImage(os.path.join(maskFolder, subjects[m] + maskSuffix))  # reference mask
 
             for i in range(0, X, sx*nx):
                 for j in range(0, Y, sy*ny):
@@ -165,21 +171,22 @@ def predictQuality(dim, H1, m1, modality, fid):
                             counter+=1
 
 
-        class_score[s-1]= temp.sum()/counter
+        class_score[l-1]= temp.sum()/counter
 
     if metric == 'PEARSON':
         predicted_score= discreteScores[np.argmax(class_score)]
     else:
         predicted_score= discreteScores[np.argmin(class_score)]
 
+    quality= 'pass' if predicted_score>max(discreteScores)/decisionFactor else 'fail'
     # for debugging
     print(predicted_score)
 
     fid.write(f'Predicted score: {predicted_score} ({min(discreteScores)} being worst, {max(discreteScores)} being best) \n')
-    fid.write('Decision: {}'.format('pass' if predicted_score>max(discreteScores)/decisionFactor else 'fail'))
+    fid.write(f'Decision: {quality}')
     fid.close()
 
-    return predicted_score
+    return (predicted_score, quality)
 
 def main():
     pass

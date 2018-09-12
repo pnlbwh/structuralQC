@@ -8,7 +8,9 @@ from loadFile import loadImage, loadCaseList, loadExcel
 from slide_filter import slide_filter
 from registration import registration
 from masking import foregroundMask
-from errorChecking import errorChecking
+from errorChecking import errorChecking, EXIT
+import glob
+from subprocess import call
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
@@ -31,24 +33,51 @@ excelFile= config_input['INPUT']['visual_qc_excel_file']
 
 def subject_register(sub_name):
     print('Registering subject ', sub_name)
-    movingImage= os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix)
+
+    #movingImage= os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix)
+
+    # inside imageFolder, images are grouped by subject folders
+    # imageSuffix should be "*t1*nii.gz" or "*t1*-reg.nii.gz" based on unregistered or registered image
+    temp= glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name+imageSuffix))
+    if len(temp)>1:
+        EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
+    movingImage= temp[0]
+
     prefix= sub_name+'-'+modality
-    registration(outDir, prefix, fixedImage, movingImage)
+    directory= os.path.join(imageFolder, sub_name, subFolder)
+    registration(directory, prefix, fixedImage, movingImage)
+    # registration(outDir, prefix, fixedImage, movingImage)
 
 def subject_mask(sub_name):
     print('Creating mask of subject ', sub_name)
     prefix= sub_name+'-'+modality
-    registeredImage= os.path.join(outDir, prefix+'-reg')
-    foregroundMask(maskFolder, prefix , registeredImage)
+    directory = os.path.join(imageFolder, sub_name, subFolder)
+    registeredImage = os.path.join(imageFolder, sub_name, subFolder, prefix + '-reg.nii.gz')
+    # registeredImage= os.path.join(outDir, prefix+'-reg.nii.gz')
+    foregroundMask(directory, prefix, registeredImage)
+    # in training mode, copy the masks to maskFolder
 
 def subject_histogram(sub_name):
     print('Calculating histogram of subject ', sub_name)
-    mri = loadImage(os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix))
-    return slide_filter(mri, '')
+
+    # the following image is always a registered image
+    temp= glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name+'-' + modality+ '-reg.nii.gz'))
+    if len(temp)>1:
+        EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
+
+    mri = loadImage(temp[0])
+    try:
+        H= slide_filter(mri, '')
+        print(f'Histogram calculation successful of subject {sub_name}')
+        return H
+    except:
+        print(f'Histogram calculation failed of subject {sub_name}')
+        exit(1)
 
 
 
-def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, register, create, hist, directory):
+def feature_represent(imgDir, subDir, type, suffix,
+                      caselist, excelFile, register, create, hist, directory, trainMode):
 
     global imageFolder, subFolder, imageSuffix, modality, outDir
 
@@ -58,11 +87,16 @@ def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, registe
     modality = type
 
     # Determine prefix and directory
+    # the output directory is where masks and histograms are stored
     if not directory:
-        outDir = imageFolder
+        directory = imageFolder
     elif not os.path.exists(directory):
         os.makedirs(directory)
-        outDir= directory
+
+    outDir= directory
+
+    if not subFolder:
+        subFolder= '.'
 
     subjects= loadCaseList(caselist)
     num_sub= len(subjects)
@@ -95,6 +129,9 @@ def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, registe
         print('Completed registration of all the subjects')
         print(f'Time taken in registration {time.time()-t1} seconds')
 
+        # now the imageSuffix should point to registered images
+        imageSuffix= f'-{modality}-reg.nii.gz'
+
 
     if create:
 
@@ -102,9 +139,10 @@ def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, registe
 
         global maskFolder
         maskFolder= os.path.join(outDir,'registered_foreground_masks')
-        os.makedirs(maskFolder)
+        if not os.path.exists(maskFolder):
+            os.makedirs(maskFolder)
         config['TRAINING']['maskFolder']= maskFolder
-        config['TRAINING'][f'{modality}MaskSuffix']= f'-{modality}-reg-fore-mask.nii.gz'
+        config['TRAINING'][f'{modality}MaskSuffix']= f'-{modality}-fore-mask.nii.gz'
 
         pool = multiprocessing.Pool()  # Use all available cores, otherwise specify the number you want as an argument
 
@@ -117,6 +155,9 @@ def feature_represent(imgDir, subDir, type, suffix, caselist, excelFile, registe
         print('Completed foreground masking of all the subjects')
         print(f'Time taken in mask creation {time.time()-t1} seconds')
 
+        if trainMode:
+            for sub in subjects:
+                call(['cp', os.path.join(imageFolder, sub, subFolder, f'{sub}-{modality}-fore-mask.nii.gz'), maskFolder])
 
 
     if hist:

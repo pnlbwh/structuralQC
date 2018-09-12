@@ -1,5 +1,5 @@
 import os
-from subprocess import check_output, call
+from subprocess import check_output
 
 def foregroundMask(directory, prefix, registeredImage):
 
@@ -19,8 +19,8 @@ def foregroundMask(directory, prefix, registeredImage):
         check_output(args)
 
     except:
-        print("Foreground masking failed")
+        print(f"Foreground masking failed of {registeredImage}")
         exit(1)
     
-    print("Foreground mask created")
+    print(f"Foreground mask created of {registeredImage}")
     return mask

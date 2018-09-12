@@ -4,8 +4,8 @@ from plumbum import cli
 from batchProcessing import batchProcessing
 from loadFile import loadExecutable, loadExternalCommands
 from feature_represent import feature_represent
-from errorChecking import EXIT
-import time
+from errorChecking import EXIT, keyPrompt
+import time, os
 
 
 class batchQC(cli.Application):
@@ -52,8 +52,8 @@ class batchQC(cli.Application):
         mandatory=False)
 
 
-    register= cli.Flag(
-        ['-r', '--registerImage'],
+    referenceImage= cli.SwitchAttr(
+        ['-r', '--referenceImage'],
         help= '''Use this option for registering input images to the reference image,
                specify the reference image.''',
         mandatory= False,
@@ -91,8 +91,20 @@ class batchQC(cli.Application):
 
     def main(self):
 
+        self.modality= self.modality.lower()
         if self.modality != 't1' and self.modality != 't2':
             EXIT('Invalid structural mri, valid types: t1/t2')
+
+        # check t1/t2 consistency
+        if self.imageSuffix:
+            if self.modality not in self.imageSuffix.lower():
+                print('Warning: Are you sure about modality and imageSuffix?')
+                keyPrompt()
+
+        if self.referenceImage:
+            if self.modality not in os.path.basename(self.referenceImage).lower():
+                print('Warning: Are you sure about modality and referenceImage?')
+                keyPrompt()
 
 
         loadExternalCommands()
@@ -100,11 +112,11 @@ class batchQC(cli.Application):
 
         if self.train:
 
-            if self.register!=None or self.create or self.hist:
+            if self.referenceImage!=None or self.create or self.hist:
 
                 feature_represent(self.imgDir, self.subDir, self.modality,
                             self.imageSuffix, self.caselist, str(self.excelFile),
-                            self.register, self.create, self.hist, self.outDir)
+                            self.referenceImage, self.create, self.hist, self.outDir, self.train)
             else:
                 EXIT('None of the training options has been selected, turn on at least one of the flags.')
 
