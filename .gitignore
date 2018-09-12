@@ -6,4 +6,4 @@
 __pycache__/
 trainingData/
 .bak
-config_input*
+config_input.ini
