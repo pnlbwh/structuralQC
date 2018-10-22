@@ -175,7 +175,7 @@ def predictQuality(dim, H1, m1, modality, fid):
                             counter+=1
 
 
-        class_score[l-1]= temp.sum()/counter
+        class_score[l]= temp.sum()/counter
 
     if metric == 'PEARSON':
         predicted_score= discreteScores[np.argmax(class_score)]

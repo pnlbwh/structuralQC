@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import configparser
-import os, time
+import os, time, sys
 import pandas as pd
 import multiprocessing
 import ast
@@ -56,11 +56,17 @@ def resultEvaluation(subjects, predicted_scores):
 
     true_scores= [visual_scores[cases.index(s)] for s in subjects]
 
+
+    orig_stdout = sys.stdout
+    f = open(os.path.join(imageFolder, 'confusion_matrix.txt'), 'w')
+    sys.stdout = f
+
     # reshaping and data type consistency are required
     print("Confusion matrix (columns are true labels, rows are predicted labels):")
     print("Visual discrete scores are: ", discreteScores)
     print(confusion_matrix(true_scores, predicted_scores, labels= discreteScores))
 
+    sys.stdout = orig_stdout
 
 
 def batchProcessing(imgDir, subDir, type,
@@ -75,8 +81,8 @@ def batchProcessing(imgDir, subDir, type,
     caselist= cases
     excelFile= xlsxFile
 
-    if not subFolder:
-        subFolder= '.'
+    # if not subFolder:
+    #     subFolder= '.'
 
     subjects = loadCaseList(caselist)
     num_sub = len(subjects)

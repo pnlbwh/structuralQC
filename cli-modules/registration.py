@@ -30,8 +30,8 @@ def registration(directory, prefix, fixedImage, movingImage):
         call(['mv', f'{prefix}-reg.nii.gz', directory])
         
     except:
-        print(f"Registration failed of {movingImage}")
+        print(f"Registration failed of {os.path.basename(movingImage)}")
         exit(1)
     
-    print(f"Registration successful of {movingImage}")
+    print(f"Registration successful of {os.path.basename(movingImage)}")
     return regImage

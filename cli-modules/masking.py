@@ -19,8 +19,8 @@ def foregroundMask(directory, prefix, registeredImage):
         check_output(args)
 
     except:
-        print(f"Foreground masking failed of {registeredImage}")
+        print(f"Foreground masking failed of {os.path.basename(registeredImage)}")
         exit(1)
     
-    print(f"Foreground mask created of {registeredImage}")
+    print(f"Foreground mask created of {os.path.basename(registeredImage)}")
     return mask

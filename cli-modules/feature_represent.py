@@ -48,6 +48,7 @@ def subject_register(sub_name):
     registration(directory, prefix, fixedImage, movingImage)
     # registration(outDir, prefix, fixedImage, movingImage)
 
+
 def subject_mask(sub_name):
     print('Creating mask of subject ', sub_name)
     prefix= sub_name+'-'+modality
@@ -61,7 +62,7 @@ def subject_histogram(sub_name):
     print('Calculating histogram of subject ', sub_name)
 
     # the following image is always a registered image
-    temp= glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name+'-' + modality+ '-reg.nii.gz'))
+    temp = glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix))
     if len(temp)>1:
         EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
 
@@ -165,7 +166,8 @@ def feature_represent(imgDir, subDir, type, suffix,
         t1= time.time()
 
         # load one image to get dimension
-        mri= loadImage(os.path.join(imageFolder, subjects[0], subFolder, subjects[0]+imageSuffix))
+        # mri= loadImage(os.path.join(imageFolder, subjects[0], subFolder, subjects[0]+imageSuffix))
+        mri= loadImage(config['TRAINING'][f'fixedImage{modality}'])
         X, Y, Z= np.shape(mri)
 
         H = np.zeros((num_sub, X//nx, Y//ny, Z//nz, POINTS), dtype=float)

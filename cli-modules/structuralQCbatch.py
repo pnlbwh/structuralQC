@@ -24,6 +24,7 @@ class batchQC(cli.Application):
     subDir= cli.SwitchAttr(
         ['-s', '--subDir'],
         help='inside subject folder, if there is any subfolder before accessing structural image',
+        default='.',
         mandatory=False)
 
     modality = cli.SwitchAttr(
