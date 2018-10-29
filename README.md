@@ -124,7 +124,8 @@ Time taken in structural QC 73.3800745010376 seconds
 
 # Batch processing
 
-
+The merit of batch processing is the creation of a `.csv` file with predicted attributes. You can append a column 
+on the right `Human validation` and put your own score/decision there.
 
 # Training:
 
