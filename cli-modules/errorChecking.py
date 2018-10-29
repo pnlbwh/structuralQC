@@ -1,3 +1,5 @@
+import glob
+
 def EXIT(msg):
     print(msg)
     exit(1)
@@ -32,3 +34,14 @@ def errorChecking(subjects, cases):
             ind= cases.index(s)
         except ValueError:
             EXIT("Case missing, compare the caselist.txt and visual_qc.xlsx")
+
+
+def globCheck(filepath):
+    temp = glob.glob(filepath)
+
+    if len(temp) > 1:
+        EXIT(f"Multiple images found with the provided suffix at {filepath}, make that unique, and try again.")
+    elif len(temp) == 0:
+        EXIT(f"No image found with the provided suffix at {filepath}. Make the suffix general and try again.")
+    else:
+        return temp

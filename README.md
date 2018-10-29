@@ -127,6 +127,7 @@ Time taken in structural QC 73.3800745010376 seconds
 The merit of batch processing is the creation of a `.csv` file with predicted attributes. You can append a column 
 on the right `Human validation` and put your own score/decision there.
 
+
 # Training:
 
 ```
@@ -195,6 +196,11 @@ The following are sample commands for training the algorithm (specify the `--tra
 
 Specify the `-r` flag followed by a fixed image to register test images to a good image. 
 Mask and histograms are created afterwards.
+
+
+Note: Specify the image suffix in a way that represents all the testing images. 
+The input `imageFolder/sub_name/subFolder` is searched for images `sub_name+imageSuffix`. 
+So, put an `*` wherever it doesn't hurt such as `-x *imageSuffix*reg*nii.gz`.
 
 
 ```
@@ -274,8 +280,9 @@ images for testing, specify the test image suffix as `{modality}-reg.nii.gz`:
 -t t1 -x -t1-reg.nii.gz
 ```
 
-To test a different set of images (register, create mask, calculate histogram), specify the image 
-suffix in a way that represents all the testing images (put an * wherever it doesn't hurt):
+To test a different set of images (register, create mask, calculate histogram), specify the 
+imageFolder, subFolder, sub_name, and imageSuffix.
+
 
 ```
 ./structuralQCbatch.py \

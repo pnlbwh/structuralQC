@@ -8,8 +8,7 @@ from loadFile import loadImage, loadCaseList, loadExcel
 from slide_filter import slide_filter
 from registration import registration
 from masking import foregroundMask
-from errorChecking import errorChecking, EXIT
-import glob
+from errorChecking import errorChecking, globCheck
 from subprocess import call
 
 config = configparser.ConfigParser()
@@ -28,9 +27,8 @@ def subject_register(sub_name):
 
     # inside imageFolder, images are grouped by subject folders
     # imageSuffix should be "*t1*nii.gz" or "*t1*-reg.nii.gz" based on unregistered or registered image
-    temp= glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name+imageSuffix))
-    if len(temp)>1:
-        EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
+    filepath= os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix)
+    temp= globCheck(filepath)
     movingImage= temp[0]
 
     prefix= sub_name+'-'+modality
@@ -52,11 +50,10 @@ def subject_histogram(sub_name):
     print('Calculating histogram of subject ', sub_name)
 
     # the following image is always a registered image
-    temp = glob.glob(os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix))
-    if len(temp)>1:
-        EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
-
+    filepath= os.path.join(imageFolder, sub_name, subFolder, sub_name + imageSuffix)
+    temp = globCheck(filepath)
     mri = loadImage(temp[0])
+
     try:
         H= slide_filter(mri, '')
         print(f'Histogram calculation successful of subject {sub_name}')

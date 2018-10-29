@@ -9,21 +9,10 @@ import ast
 
 from loadFile import loadExcel, loadCaseList
 from calculation import processImage
-from errorChecking import errorChecking, EXIT
+from errorChecking import errorChecking, globCheck
 
 from sklearn.metrics import confusion_matrix
-import glob
 
-'''
-config_input = configparser.ConfigParser()
-config_input.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config_input.ini')))
-imageFolder= config_input['INPUT']['imageFolder']
-caselist = config_input['INPUT']['caselist']
-subFolder= config_input['INPUT']['subFolder']
-imageSuffix= config_input['INPUT']['imageSuffix']
-modality= config_input['INPUT']['modality']
-excelFile= config_input['INPUT']['visual_qc_excel_file']
-'''
 
 config = configparser.ConfigParser()
 config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
@@ -37,9 +26,8 @@ def subject_prediction(sub):
 
     # inside imageFolder, images are grouped by subject folders
     # imageSuffix should be "*t1*nii.gz" or "*t1*-reg.nii.gz" based on unregistered or registered image
-    temp= glob.glob(os.path.join(imageFolder, sub, subFolder, sub+imageSuffix))
-    if len(temp)>1:
-        EXIT(f"Multiple {modality} images found with the provided suffix, make that unique, and try again.")
+    filepath= os.path.join(imageFolder, sub, subFolder, sub+imageSuffix)
+    temp= globCheck(filepath)
     img= temp[0]
     # processImage(imgPath, maskPath, directory, modality)
     prediction= processImage(img, 'None', '', modality)
