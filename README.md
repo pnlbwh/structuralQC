@@ -340,5 +340,45 @@ quality= 'pass' if predicted_score>score_range/decisionFactor else 'fail'
 ```
 
 
+# Recommendation
 
+Source:
+
+Training image for T1: mindcontrol HBN data
+Training image for T2: DIAGNOSE_CTE_U01 data
+
+Current results:
+
+Detection accuracy of bad images: ~95%
+Detection accuracy of good images: ~70%
+
+Confusion matrix:
+
+T1 images from mindcontrol HBN data
+
+|  | Bad | Good |
+| --- | --- | --- |
+| Bad |  95 | 5 |
+| Good | 47 | 53 |
+
+
+That means there is a significant likelihood that good images fall in the bad bin. But, bad images rarely fall in the
+good bin.
+
+
+T2 images from DIAGNOSE_CTE_U01 data
+
+
+|  | Bad | Good |
+| --- | --- | --- |
+| Bad |  99 | 1 |
+| Good | 0 | 100 |
+
+
+The above data was not balanced between good and bad images. The result might be overfitting or reasonable because of 
+the consistency among sites/raters.
+
+
+So the recommendation is to visually observe images that are given a bad label 
+(because good images have a significant chance of being classified as bad by the algorithm).
 
