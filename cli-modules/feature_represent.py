@@ -20,16 +20,6 @@ nz = int(config['DEFAULT']['nz'])
 
 POINTS= int(config['DEFAULT']['POINTS'])
 
-'''
-config_input = configparser.ConfigParser()
-config_input.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config_input.ini')))
-imageFolder= config_input['INPUT']['imageFolder']
-caselist = config_input['INPUT']['caselist']
-subFolder= config_input['INPUT']['subFolder']
-imageSuffix= config_input['INPUT']['imageSuffix']
-modality= config_input['INPUT']['modality']
-excelFile= config_input['INPUT']['visual_qc_excel_file']
-'''
 
 def subject_register(sub_name):
     print('Registering subject ', sub_name)

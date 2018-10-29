@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 import configparser
-import os, time, sys
+import os, sys
 import pandas as pd
 import multiprocessing
 import ast

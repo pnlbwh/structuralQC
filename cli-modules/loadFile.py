@@ -55,9 +55,8 @@ def loadExternalCommands():
     config = configparser.ConfigParser()
     config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
 
-    apps = ['Slicer', 'antsRegistration', 'BRAINSROIAuto']
+    apps = ['Slicer', 'antsRegistration']
     for exe in apps:
-        os.environ["PATH"] += ':' + os.path.abspath(config['EXECUTABLES'][exe])
         loadExecutable(exe)
 
     print('All executables are found, program will begin now ...')

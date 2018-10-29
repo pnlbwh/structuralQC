@@ -182,12 +182,13 @@ def predictQuality(dim, H1, m1, modality, fid):
     else:
         predicted_score= discreteScores[np.argmin(class_score)]
 
-    quality= 'pass' if predicted_score>max(discreteScores)/decisionFactor else 'fail'
+    score_range= np.ptp(discreteScores)+1 if min(discreteScores)>0 else np.ptp(discreteScores)
+    quality= 'pass' if predicted_score>score_range/decisionFactor else 'fail'
     # for debugging
-    print(predicted_score)
+    print(predicted_score, quality)
 
     fid.write(f'Predicted score: {predicted_score} ({min(discreteScores)} being worst, {max(discreteScores)} being best) \n')
-    fid.write(f'Decision: {quality}')
+    fid.write(f'Decision: {quality} \n')
     fid.close()
 
     return (predicted_score, quality)
