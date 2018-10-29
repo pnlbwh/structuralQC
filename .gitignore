@@ -7,3 +7,4 @@ __pycache__/
 trainingData/
 .bak
 .local
+config.ini

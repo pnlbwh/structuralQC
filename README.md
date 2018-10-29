@@ -31,7 +31,8 @@ After unzipping the source code, update the configuration file [config.ini](./co
 to point to the correct location of fixed image, training masks, and histograms.
 
 > unzip structuralQC.zip .
-> tax -xzvf training_data.tar.gz .
+
+> tar -xzvf training_data.tar.gz .
 
 *Note: There is seperate training data for the `T1` and `T2` images. So, be sure to point to the proper location.
 
