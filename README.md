@@ -352,7 +352,7 @@ Current results:
 Detection accuracy of bad images: ~95%
 Detection accuracy of good images: ~70%
 
-Confusion matrix:
+Percentage confusion matrix:
 
 T1 images from mindcontrol HBN data
 
