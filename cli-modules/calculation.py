@@ -2,7 +2,6 @@ import configparser
 import numpy as np
 from scipy.stats import pearsonr
 import glob
-import ast
 
 import os
 
@@ -34,7 +33,7 @@ decisionFactor= int(config['DEFAULT']['decisionFactor'])
 eta = float(config['DEFAULT']['eta'])
 metric= config['DEFAULT']['metric']
 
-discreteScores = ast.literal_eval(config['TRAINING']['discreteScores'])
+discreteScores = [int(x) for x in config['TRAINING']['discreteScores'][1:-1].split(',')]
 fixedImaget1= os.path.join(moduleDir, config['TRAINING']['fixedImaget1'])
 fixedImaget2= os.path.join(moduleDir, config['TRAINING']['fixedImaget2'])
 
