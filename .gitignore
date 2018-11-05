@@ -1,0 +1,10 @@
+# Compiled source #
+###################
+
+*.pyc
+.idea
+__pycache__/
+trainingData/
+.bak
+.local
+config.ini
