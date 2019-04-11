@@ -69,9 +69,6 @@ def batchProcessing(imgDir, subDir, type,
     caselist= cases
     excelFile= xlsxFile
 
-    # if not subFolder:
-    #     subFolder= '.'
-
     subjects = loadCaseList(caselist)
     num_sub = len(subjects)
 
@@ -102,7 +99,16 @@ def batchProcessing(imgDir, subDir, type,
     f.close()
     '''
 
-    if excelFile:
+    # uncomment the following for result evaluation w/o processing
+    # import glob
+    # predicted_scores= []
+    # for sub in subjects:
+    #     qcFile= glob.glob(os.path.join(imageFolder, sub, '*.txt'))[0]
+    #     with open(qcFile) as f:
+    #         content= f.read()
+    #         predicted_scores.append(int(content.split()[2]))
+
+    if excelFile!='None':
         resultEvaluation(subjects, predicted_scores)
 
 def main():
