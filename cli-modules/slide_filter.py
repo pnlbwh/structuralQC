@@ -18,9 +18,9 @@ def slide_filter(mri, histName):
 
     G = np.zeros((1, X//nx, Y//ny, Z//nz, POINTS), dtype=float)
 
-    for i in range(0, X, nx):
-        for j in range(0, Y, ny):
-            for k in range(0, Z, nz):
+    for i in range(0, X-nx, nx):
+        for j in range(0, Y-ny, ny):
+            for k in range(0, Z-nz, nz):
 
                 patch = mri[i:i + nx, j:j + ny, k:k + nz]
 
