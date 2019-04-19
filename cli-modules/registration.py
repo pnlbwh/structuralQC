@@ -1,37 +1,53 @@
 import os
-from subprocess import check_call, call
+from subprocess import check_call
+from plumbum.cmd import antsApplyTransforms
+from plumbum import FG
 
-def registration(directory, prefix, fixedImage, movingImage):
 
-    regImage= os.path.join(directory, prefix+'-reg.nii.gz')
+def registration(directory, prefix, fixedImage, fixedMask, movingImage, threads=4):
 
-    imgs= f'{fixedImage}, {movingImage}'
-    
+    outPrefix= os.path.join(directory, prefix)
+
     try:
-        # antsRegistration doesn't work without (' ').join
-        args = (' ').join(['antsRegistration', '-d', '3', '-r', f'[{imgs}, 1]',
-                '-m', f'mattes[{imgs}, 1, 32, regular, 0.1]',
-                '-t', 'affine[0.1]',
-                '-c', '[500x500x50, 1e-3, 20]',
-                '-s', '4x2x1vox',
-                '-n', 'bspline',
-                '-f', '3x2x1',
-                '-l', '1',
-                '-z', '1',
-                '-o', f'[{prefix}, {prefix}-reg.nii.gz]'
-                ])
-              
-        # print(args)
-        
-        # for antsRegistration, shell= True is a must
-        check_call(args, shell= True)
+        if not fixedMask:
+            check_call((' ').join(['antsRegistrationSyNMI.sh',
+                                   '-d', '3',
+                                   '-f', fixedImage,
+                                   '-m', movingImage,
+                                   '-o', outPrefix,
+                                   '-n', str(threads),
+                                   ]), shell = True)
+        else:
+            check_call((' ').join(['antsRegistrationSyNMI.sh',
+                                   '-d', '3',
+                                   '-f', fixedImage,
+                                   '-x', fixedMask,
+                                   '-m', movingImage,
+                                   '-o', outPrefix,
+                                   '-n', str(threads),
+                                   ]), shell = True)
 
-        call(['rm', f'{prefix}0GenericAffine.mat'])
-        call(['mv', f'{prefix}-reg.nii.gz', directory])
-        
+        warp = outPrefix + '1Warp.nii.gz'
+        trans = outPrefix + '0GenericAffine.mat'
+        regImage = os.path.join(directory, prefix + '-reg.nii.gz')
+
+        antsApplyTransforms[
+            '-d', '3',
+            '-i', movingImage,
+            '-o', regImage,
+            '-r', fixedImage,
+            '-t', warp, trans
+        ] & FG
+
+        check_call(['rm', warp])
+        check_call(['rm', trans])
+        check_call(['rm', outPrefix + 'Warped.nii.gz'])
+        check_call(['rm', outPrefix + '1InverseWarp.nii.gz'])
+        check_call(['rm', outPrefix + 'InverseWarped.nii.gz'])
+
+        print(f"Registration successful of {os.path.basename(movingImage)}")
+        return regImage
+
+
     except:
-        print(f"Registration failed of {os.path.basename(movingImage)}")
-        exit(1)
-    
-    print(f"Registration successful of {os.path.basename(movingImage)}")
-    return regImage
+        raise RuntimeError(f"Registration failed of {os.path.basename(movingImage)}")

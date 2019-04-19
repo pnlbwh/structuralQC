@@ -1,25 +1,18 @@
 import configparser
 import numpy as np
 from scipy.stats import pearsonr
-import glob
-
 import os
 
 from registration import registration
-from masking import foregroundMask
 from loadFile import loadImage, loadExcel
 from slide_filter import slide_filter
 
-# global configurations ---------------------------------------
-# get structuralQC directory
-
-# TODO: moduleDir usage should be ommited, come up with better design
-
-moduleDir= os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
-eps = 2.2204e-16 # a small number to prevent divide by zero
-
+SCRIPTDIR= os.path.abspath(os.path.dirname(__file__))
 config = configparser.ConfigParser()
-config.read(os.path.join(moduleDir,'structuralQC','config.ini'))
+config.read(os.path.join(SCRIPTDIR, 'config.ini'))
+
+# global configurations ---------------------------------------
+eps = 2.2204e-16 # a small number to prevent divide by zero
 nx = int(config['DEFAULT']['nx'])
 ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])
@@ -34,8 +27,14 @@ eta = float(config['DEFAULT']['eta'])
 metric= config['DEFAULT']['metric']
 
 discreteScores = [int(x) for x in config['TRAINING']['discreteScores'][1:-1].split(',')]
-fixedImaget1= os.path.join(moduleDir, config['TRAINING']['fixedImaget1'])
-fixedImaget2= os.path.join(moduleDir, config['TRAINING']['fixedImaget2'])
+fixedImaget1= config['TRAINING']['fixedImaget1']
+fixedImaget2= config['TRAINING']['fixedImaget2']
+fixedMaskt1= config['TRAINING']['fixedMaskt1']
+fixedMaskt2= config['TRAINING']['fixedMaskt2']
+# if not fixedMaskt1:
+#     fixedMaskt1 = None
+# if not fixedMaskt2:
+#     fixedMaskt2 = None
 
 # ----------------------------------------------------------------
 
@@ -48,7 +47,7 @@ def KL(P, Q):
     return np.sum([P[i]*np.log(P[i]/Q[i]) for i in range(len(P))])
 
 
-def processImage(imgPath, maskPath, directory, modality):
+def processImage(imgPath, directory, modality):
 
     # for debugging
     print(imgPath)
@@ -59,79 +58,44 @@ def processImage(imgPath, maskPath, directory, modality):
     elif not os.path.exists(directory):
         os.makedirs(directory)
 
-
     prefix = os.path.basename(imgPath).split('.')[0]
 
-    createMask= False
     # check if 'reg' keyword exists in prefix, if not then register to fixedImage
     if 'reg' not in prefix:
         print('\'reg\' keyword is not present in input image. Registering with reference image ...')
 
-        createMask= True # if registration is done, foreground mask must be recreated
-
         if modality=='t1':
-            regPath = registration(directory, prefix, fixedImaget1, imgPath)
+            regPath = registration(directory, prefix, fixedImaget1, fixedImaget1, imgPath)
         else:
-            regPath = registration(directory, prefix, fixedImaget2, imgPath)
+            regPath = registration(directory, prefix, fixedImaget2, fixedImaget2, imgPath)
     else:
         regPath= imgPath
         print('Registered image found ...')
 
-
-    # if mask not provided, check for '-fore-mask.nii.gz' keyword in input directory, if not then create foreground mask
-    if maskPath=='None':
-
-        # take into account both upper and lower cases
-        potentialMask= glob.glob(os.path.join(directory, f'*{modality}*-fore-mask.nii.gz'))
-        if not potentialMask:
-            potentialMask= glob.glob(os.path.join(directory, f'*{modality.upper()}*-fore-mask.nii.gz'))
-
-        num= len(potentialMask)
-        if num>1:
-            print('Multiple foreground mask exists in input image directory (default).'
-                  'Delete all but one and try again')
-            exit(1)
-
-        elif num==0 or createMask:
-            print('Creating mask ...')
-            # create the foreground mask
-            maskPath= foregroundMask(directory, prefix, regPath)
-        
-        else:
-            maskPath= potentialMask[0]
-            print('Mask found ...')
-
-
     # load the mri and the mask
     mri= loadImage(regPath)
-    mask= loadImage(maskPath)
 
     # extract feature from the mri
-    histName = os.path.join(directory, prefix + '-histogram' + '.npy')
-    H_test= slide_filter(mri, histName)
+    # histName = os.path.join(directory, prefix + '-histogram' + '.npy')
+    # H_test= slide_filter(mri*mask, histName)
+    H_test= slide_filter(mri, '')
 
     dim= np.shape(mri)
 
     fid= open(os.path.join(directory, prefix + '-quality' + '.txt'), 'w')
 
     print("Checking quality ...")
-    prediction= predictQuality(dim, H_test, mask, modality, fid)
+    prediction= predictQuality(dim, H_test, modality, fid)
 
     return prediction
 
-def predictQuality(dim, H1, m1, modality, fid):
+def predictQuality(dim, H1, modality, fid):
 
-
-    excelFile= os.path.join(moduleDir, config['TRAINING']['visual_qc_excel_file'])
+    excelFile= config['TRAINING']['visual_qc_excel_file']
     subjects, ratings= loadExcel(excelFile, modality)
-    
-    
+
     # load reference histogram file
-    H2= np.load(os.path.join(moduleDir, config['TRAINING'][modality+'Histogram']))
-
-    maskFolder= os.path.join(moduleDir, config['TRAINING']['maskFolder'])
-    maskSuffix= config['TRAINING'][f'{modality}MaskSuffix']
-
+    H2= np.load(config['TRAINING'][modality+'Histogram'])
 
     class_score= np.zeros(len(discreteScores), dtype= float)
 
@@ -144,19 +108,14 @@ def predictQuality(dim, H1, m1, modality, fid):
 
         for m in ind: # reference subjects
 
-            m2 = loadImage(os.path.join(maskFolder, subjects[m] + maskSuffix))  # reference mask
-
-            for i in range(0, X, sx*nx):
-                for j in range(0, Y, sy*ny):
-                    for k in range(0, Z, sz*nz):
-
-                        p1 = m1[i:i + nx, j:j + ny, k:k + nz] # Test patch
-                        p2 = m2[i:i + nx, j:j + ny, k:k + nz] # Reference patch
+            for i in range(0, X-nx, sx*nx):
+                for j in range(0, Y-nx, sy*ny):
+                    for k in range(0, Z-nx, sz*nz):
 
                         P = H1[0, i // nx, j // ny, k // nz, :] # Test histogram
                         Q = H2[m, i // nx, j // ny, k // nz, :] # Reference histogram
 
-                        if p1.max() and p2.max() and np.multiply(P,Q).sum() and np.multiply(p1, p2).sum()> 0.5*eta*(p1.sum()+p2.sum()):
+                        if np.multiply(P,Q).sum():
 
                             if metric == 'PEARSON':
                                 temp[counter]= max(pearsonr(P, Q))
@@ -196,7 +155,6 @@ def main():
     pass
     # test the algorithm on a test image
     # processImage()
-
 
 if __name__== '__main__':
     main()

@@ -1,10 +1,11 @@
 import numpy as np
 import configparser
 from extract_feature import extract_feature
-import os
+from os.path import abspath, dirname, join as pjoin
 
+SCRIPTDIR= abspath(dirname(__file__))
 config = configparser.ConfigParser()
-config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+config.read(pjoin(SCRIPTDIR, 'config.ini'))
 nx = int(config['DEFAULT']['nx'])
 ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])

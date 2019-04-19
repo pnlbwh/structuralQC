@@ -1,4 +1,4 @@
-import glob, sys
+import glob
 
 def EXIT(msg):
     raise RuntimeError(msg)
