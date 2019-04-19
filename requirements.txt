@@ -1,0 +1,8 @@
+plumbum
+scipy
+numpy
+pandas
+nibabel
+pynrrd
+psutil
+ipython
