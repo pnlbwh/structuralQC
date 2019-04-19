@@ -51,7 +51,11 @@ def loadExecutable(exe):
 
 def loadExternalCommands():
 
-    apps = ['antsRegistration']
+    apps = ['antsApplyTransforms',
+            'antsRegistrationSyNQuick.sh',
+            'antsRegistration',
+            'antsRegistrationSyNMI.sh']
+
     for exe in apps:
         loadExecutable(exe)
 
