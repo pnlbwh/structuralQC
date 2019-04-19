@@ -1,3 +1,36 @@
+![](doc/pnl-bwh-hms.png)
+
+[![DOI](https://zenodo.org/badge/doi/10.5281/zenodo.2584281.svg)](https://doi.org/10.5281/zenodo.2584281) [![Python](https://img.shields.io/badge/Python-3.6-green.svg)]() [![Platform](https://img.shields.io/badge/Platform-linux--64%20%7C%20osx--64-orange.svg)]()
+
+*structuralQC* repository is developed by Tashrif Billah and Sylvain Bouix, Brigham and Women's Hospital (Harvard Medical School).
+
+Table of Contents
+=================
+
+   * [Structural MRI quality check tool](#structural-mri-quality-check-tool)
+   * [Citation](#citation)
+   * [Dependencies](#dependencies)
+   * [Installation](#installation)
+      * [1. Install prerequisites](#1-install-prerequisites)
+         * [Python 3](#python-3)
+         * [Template T1 and T2](#template-t1-and-t2)
+      * [2. Install QC tool](#2-install-qc-tool)
+      * [3 Download reference data](#3-download-reference-data)
+      * [4. Configure your environment](#4-configure-your-environment)
+   * [Tests](#tests)
+   * [Individual processing](#individual-processing)
+   * [Batch processing](#batch-processing)
+   * [Training:](#training)
+   * [Testing](#testing)
+   * [Caselist generation](#caselist-generation)
+   * [Advanced options](#advanced-options)
+   * [Recommendation](#recommendation)
+
+Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
+
+
+# Structural MRI quality check tool
+
 structuralQC is a machine learning algorithm that predicts a structural mri (T1 or T2)
 as a good or bad image. During acquisition of mri, it might be affected with 
 motion, ghosting, or ringing aritficats. Further processing down any pipeline may be 
@@ -15,19 +48,104 @@ and predicted as pass/fail.
 
 If you use our software in your research, please cite as below:
 
-Tashrif Billah, Isaiah Norton, and Sylvain Bouix, Structural Quality Check Tool, https://github.com/pnlbwh/structuralQC, 
-2018, Psychiatry Neuroimaging Laboratory, Brigham and Women's Hospital and Harvard Medical School.
+Tashrif Billah and Sylvain Bouix, Structural MRI Quality Check Tool, https://github.com/pnlbwh/structuralQC, 
+2018, DOI: 10.5281/zenodo.2584281
 
+
+# Dependencies
+
+* ANTs
+* numpy
+* scipy
+* nibabel
+* pynrrd
+* plumbum
+* pandas
 
 # Installation
 
-You need Python 3 to run our program. Dependencies are:
+## 1. Install prerequisites
 
-> pip install plumbum scipy pandas nibabel nrrd
+### Python 3
+
+Check system architecture
+
+    uname -a # check if 32 or 64 bit
 
 
-Once dependencies are solved, download the source code, training data, and test data.
-After unzipping the source code, update the configuration file [config.ini](./config.ini)
+Download [Miniconda Python 3.6 bash installer](https://docs.conda.io/en/latest/miniconda.html) (32/64-bit based on your environment):
+    
+    sh Miniconda3-latest-Linux-x86_64.sh -b # -b flag is for license agreement
+
+Activate the conda environment:
+
+    source ~/miniconda3/bin/activate # should introduce '(base)' in front of each line
+
+
+### Template T1 and T2
+
+The quality check algorithm works by registering input image to a qood quality T1/T2 image. You may specify a 
+site-specific T1/T2 image. If the image is not mask, you may specify a mask as well. Otherwise, you may 
+use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_asym_09a_nifti.zip). 
+
+* NOTE: unzip `mni_icbm152_nlin_asym_09a_nifti.zip` look for
+     
+    mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
+    mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
+
+
+## 2. Install QC tool
+
+Now that you have installed the prerequisite software, you are ready to install the pipeline:
+
+    git clone https://github.com/pnlbwh/structuralQC.git
+    conda create -f environmnet.yml     # you may comment out any existing package from environment.yml
+    conda activate structQC             # should introduce '(structQC)' in front of each line
+
+
+Alternatively, if you already have ANTs, you can continue using your python environment by directly installing 
+the prerequisite libraries:
+
+    pip install -r requirements.txt --upgrade
+
+
+## 3 Download reference data
+
+    ./get_ref_data.sh
+
+## 4. Configure your environment
+
+Make sure the following executables are in your path:
+
+    antsApplyTransforms
+    antsRegistrationSyNQuick.sh
+    antsRegistration
+    antsRegistrationSyNMI.sh
+    
+You can check them as follows:
+
+    which antsRegistrationSyNMI.sh
+    
+If any of them does not exist, add that to your path:
+
+    export PATH=$PATH:/directory/of/executable
+    
+`conda activate structQC` should already put the ANTs scripts in your path. However, if you choose to use pre-installed ANTs scripts, 
+you may need to define [ANTSPATH](https://github.com/ANTsX/ANTs/wiki/Compiling-ANTs-on-Linux-and-Mac-OS#set-path-and-antspath)
+
+
+
+# Tests
+
+After configuring your environment, you can download provided data and run tests:
+
+    ./cli-modules/structuralQC.py -i t1_test_image.nrrd -t t1 --fixedImage mniTemplateT1.nii.gz
+    ./cli-modules/structuralQC.py -i t2_test_image.nrrd -t t2 --fixedImage mniTemplateT2.nii.gz
+    
+    
+    
+# ---------------------------------------------------------------------------------------------------------------------    
+unzipping the source code, update the configuration file [config.ini](./config.ini)
 to point to the correct location of fixed image, training masks, and histograms.
 
 > unzip structuralQC.zip .
@@ -39,18 +157,11 @@ to point to the correct location of fixed image, training masks, and histograms.
 
 After the above steps, you can test your installation:
 
-```
-./cli-modules/structuralQC.py -i t1_test_image.nrrd
-./cli-modules/structuralQC.py -i t2_test_image.nrrd
-```
+
+
 
 If everything is done well, some files will be created in the training_data directory. 
 You can observe them to see the results.
-
-
-*Note: In future, we shall make it a python package that builds automatically.
-
-
 
 
 
@@ -82,9 +193,7 @@ Switches:
 
 Given a structural image (T1 or T2), the algorithm can predict that as a good or bad image. 
 
-> ./structuralQC.py -i image.nrrd -t t1
-
-Additionally, mask `-m` and output folder `-o` can be specified.
+> ./structuralQC.py -i image.nrrd -t t1 --fixedImage -o /tmp/
 
 
 You can write a shell script to exploit the above for batch of data. However, you can also use the following batch processing to do it 
@@ -92,7 +201,7 @@ easily.
 
 
 
-The program first looks for Slicer and ansRegistration executables in system path. If they are not available, it exits immediately.
+The program first looks for ansRegistration executables in system path. If they are not available, it exits immediately.
 
 ```
 Slicer found
@@ -375,8 +484,8 @@ T2 images from DIAGNOSE_CTE_U01 data
 | Good | 0 | 100 |
 
 
-The above data was not balanced between good and bad images. The result might be overfitting or reasonable because of 
-the consistency among sites/raters.
+The above data was not balanced between good and bad images. There might be overfitting or inconsistency 
+among sites/raters.
 
 
 So the recommendation is to visually observe images that are given a bad label 
