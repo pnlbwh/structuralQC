@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 
-VERSION=2.0.0
+VERSION=2.0.2
 
-# download data
-REFDATA=reference_data
-wget reference_data/ https://github.com/pnlbwh/structuralQC/archive/v${VERSION}/$REFDATA.zip
-tar -xzvf $REFDATA
+echo Downloading reference data
+REFDATA=ref_data
+wget reference_data/ https://github.com/pnlbwh/structuralQC/releases/download/v$VERSION/$REFDATA.zip
+tar -xzvf $REFDATA.zip
 
 # get script directory
 SCRIPT=$(readlink -m $(type -p $0))
 SCRIPTDIR=$(dirname $SCRIPT)
 
 # define train directory
-TRAINDIR=$SCRIPTDIR/train_data
-mkdir $TRAINDIR
+TRAINDIR=$SCRIPTDIR/$REFDATA
 
-# update config.ini
-sed -i "s/train_data/$TRAINDIR/g" $SCRIPTDIR/cli-modules/config.ini
+echo Updating config.ini
+sed -i "s+train_data+$TRAINDIR+g" $SCRIPTDIR/cli-modules/config.ini
