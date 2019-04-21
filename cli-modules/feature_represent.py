@@ -75,7 +75,8 @@ def feature_represent(imgs, subjects, register, hist, modality, outDir):
         print(f'Time taken in registration {time.time()-t1} seconds')
 
 
-    if hist:
+    # if registration is done, we must obtain histogram again
+    if register or hist:
 
         t1= time.time()
 
