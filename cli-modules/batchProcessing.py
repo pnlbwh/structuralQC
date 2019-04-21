@@ -6,47 +6,29 @@ import pandas as pd
 import multiprocessing
 import ast
 
-
-from loadFile import loadExcel, loadCaseList
+from loadFile import loadExcel
 from calculation import processImage
 from errorChecking import errorChecking, globCheck
 
 from sklearn.metrics import confusion_matrix
 
-
+SCRIPTDIR= os.path.abspath(os.path.dirname(__file__))
 config = configparser.ConfigParser()
-config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+config.read(os.path.join(SCRIPTDIR, 'config.ini'))
 discreteScores = ast.literal_eval(config['TRAINING']['discreteScores'])
+excelFile= config['TRAINING']['visual_qc_excel_file']
+N_CPU= int(config['RESOURCE']['N_CPU'])
 
-
-def subject_prediction(sub):
-
-    # By this design, the user should have more flexibility in naming the files
-    # Also, it should be easier to reuse registered images and masks
-
-    # inside imageFolder, images are grouped by subject folders
-    # imageSuffix should be "*t1*nii.gz" or "*t1*-reg.nii.gz" based on unregistered or registered image
-    filepath= os.path.join(imageFolder, sub, subFolder, sub+imageSuffix)
-    temp= globCheck(filepath)
-    img= temp[0]
-    # processImage(imgPath, maskPath, directory, modality)
-    prediction= processImage(img, 'None', '', modality)
-
-    return prediction
-
-
-def resultEvaluation(subjects, predicted_scores):
+def resultEvaluation(caselistSubjects, predicted_scores, modality, outDir):
 
     # read the Subject ID and {modality} column
-    cases, visual_scores= loadExcel(excelFile, modality)
+    excelCaseIds, visual_scores= loadExcel(excelFile, modality)
 
-    errorChecking(subjects, cases)
-
-    true_scores= [visual_scores[cases.index(s)] for s in subjects]
+    true_scores= [visual_scores[excelCaseIds.index(s)] for s in caselistSubjects]
 
 
     orig_stdout = sys.stdout
-    f = open(os.path.join(imageFolder, 'confusion_matrix.txt'), 'w')
+    f = open(os.path.join(outDir, 'confusion_matrix.txt'), 'w')
     sys.stdout = f
 
     # reshaping and data type consistency are required
@@ -57,30 +39,22 @@ def resultEvaluation(subjects, predicted_scores):
     sys.stdout = orig_stdout
 
 
-def batchProcessing(imgDir, subDir, type,
-                    suffix, cases, xlsxFile):
+def batchProcessing(imgs, subjects, modality, outDir):
 
-    global imageFolder, subFolder, modality, imageSuffix, caselist, excelFile
-
-    imageFolder= imgDir
-    subFolder= subDir
-    modality= type
-    imageSuffix= suffix
-    caselist= cases
-    excelFile= xlsxFile
-
-    # if not subFolder:
-    #     subFolder= '.'
-
-    subjects = loadCaseList(caselist)
     num_sub = len(subjects)
 
-    pool = multiprocessing.Pool()  # Use all available cores, otherwise specify the number you want as an argument
+    # Use all available cores, otherwise specify the number you want as an argument
+    pool = multiprocessing.Pool(N_CPU)
+    res=[]
+    for img in imgs:
+        res.append(pool.apply_async(func= processImage, args= (img, '', modality)))
 
-    res = pool.map_async(subject_prediction, subjects)
-    attributes  = res.get()
-    predicted_scores= [attributes[i][0] for i in range(num_sub)]
-    predicted_quality = [attributes[i][1] for i in range(num_sub)]
+    predicted_scores=[]
+    predicted_quality=[]
+    for r in res:
+        attributes  = r.get()
+        predicted_scores.append(attributes[0])
+        predicted_quality.append(attributes[1])
 
     pool.close()
     pool.join()
@@ -90,20 +64,10 @@ def batchProcessing(imgDir, subDir, type,
             f'Predicted score ({min(discreteScores)} being worst, {max(discreteScores)} being best)': predicted_scores,
             'Quality': predicted_quality})
 
-    df.to_csv(os.path.join(imageFolder, f'{modality}_QC_scores.csv'), index= False)
+    df.to_csv(os.path.join(outDir, f'{modality}_QC_scores.csv'), index= False)
 
-    # another way of saving data
-    '''
-    f = open(os.path.join(os.path.dirname(caselist), f'{modality}_QC_scores.csv'), 'w')
-    f.write(f'Case #, Predicted score ({min(discreteScores)} being worst, {max(discreteScores)} being best) \n')
-    for i in range(num_sub):
-        f.write(subjects(i) + ',' + str(predicted_scores) + '\n')
-
-    f.close()
-    '''
-
-    if excelFile:
-        resultEvaluation(subjects, predicted_scores)
+    if excelFile!='None':
+        resultEvaluation(subjects, predicted_scores, modality, outDir)
 
 def main():
     pass

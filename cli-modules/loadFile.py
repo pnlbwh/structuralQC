@@ -6,8 +6,7 @@ with warnings.catch_warnings():
     
 import distutils.spawn
 import pandas as pd
-
-import os, configparser
+from os.path import isfile
 
 def loadNrrd(fileName):
     img = nrrd.read(fileName)
@@ -52,10 +51,11 @@ def loadExecutable(exe):
 
 def loadExternalCommands():
 
-    config = configparser.ConfigParser()
-    config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+    apps = ['antsApplyTransforms',
+            'antsRegistrationSyNQuick.sh',
+            'antsRegistration',
+            'antsRegistrationSyNMI.sh']
 
-    apps = ['Slicer', 'antsRegistration']
     for exe in apps:
         loadExecutable(exe)
 
@@ -75,3 +75,19 @@ def loadCaseList(fileName):
 
 
     return subjects
+
+
+def loadImageList(file):
+
+    with open(file) as f:
+
+        imgs = []
+        content= f.read()
+        for line, row in enumerate(content.split()):
+            if row and not isfile(row): # handling w/space
+                raise FileNotFoundError(f'{row} can\'t be found: check line {line} in {file}')
+            else:
+                imgs.append(row)
+
+
+    return imgs

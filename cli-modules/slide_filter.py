@@ -1,10 +1,11 @@
 import numpy as np
 import configparser
 from extract_feature import extract_feature
-import os
+from os.path import abspath, dirname, join as pjoin
 
+SCRIPTDIR= abspath(dirname(__file__))
 config = configparser.ConfigParser()
-config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+config.read(pjoin(SCRIPTDIR, 'config.ini'))
 nx = int(config['DEFAULT']['nx'])
 ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])
@@ -18,9 +19,9 @@ def slide_filter(mri, histName):
 
     G = np.zeros((1, X//nx, Y//ny, Z//nz, POINTS), dtype=float)
 
-    for i in range(0, X, nx):
-        for j in range(0, Y, ny):
-            for k in range(0, Z, nz):
+    for i in range(0, X-nx, nx):
+        for j in range(0, Y-ny, ny):
+            for k in range(0, Z-nz, nz):
 
                 patch = mri[i:i + nx, j:j + ny, k:k + nz]
 

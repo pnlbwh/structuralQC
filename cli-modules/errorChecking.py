@@ -1,8 +1,7 @@
 import glob
 
 def EXIT(msg):
-    print(msg)
-    exit(1)
+    raise RuntimeError(msg)
 
 
 def keyPrompt():

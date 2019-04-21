@@ -1,8 +1,10 @@
 import numpy as np
-import configparser, os
+import configparser
+from os.path import abspath, dirname, join as pjoin
 
+SCRIPTDIR= abspath(dirname(__file__))
 config = configparser.ConfigParser()
-config.read(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'config.ini')))
+config.read(pjoin(SCRIPTDIR, 'config.ini'))
 POINTS= int(config['DEFAULT']['POINTS'])
 
 def extract_feature(volume):
