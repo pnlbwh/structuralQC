@@ -106,8 +106,8 @@ use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2
 Now that you have installed the prerequisite software, you are ready to install the pipeline:
 
     git clone https://github.com/pnlbwh/structuralQC.git
-    conda create -f environmnet.yml     # you may comment out any existing package from environment.yml
-    conda activate structQC             # should introduce '(structQC)' in front of each line
+    conda env create -f environment.yml   # you may comment out any existing package from environment.yml
+    conda activate structQC               # should introduce '(structQC)' in front of each line
 
 
 Alternatively, if you already have ANTs, you can continue using your python environment by directly installing 
