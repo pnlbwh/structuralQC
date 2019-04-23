@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
 
-VERSION=2.0.4
+# get version info
+IFS=" = ", read -r _ v < _version.py
+__version__=`echo $v | xargs`
 
 echo Downloading reference data
 REFDATA=ref_data
-wget reference_data/ https://github.com/pnlbwh/structuralQC/releases/download/v$VERSION/$REFDATA.zip
+wget reference_data/ https://github.com/pnlbwh/structuralQC/releases/download/v${__version__}/$REFDATA.zip
 tar -xzvf $REFDATA.zip
 
 # get script directory
