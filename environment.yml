@@ -9,6 +9,8 @@ dependencies:
     - ipython
     - numpy
     - nibabel
+    - pandas
+    - xlrd
     - scipy
     - psutil
     - plumbum
