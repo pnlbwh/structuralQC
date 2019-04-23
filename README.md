@@ -93,7 +93,7 @@ Activate the conda environment:
 
 The quality check algorithm works by registering input image to a qood quality T1/T2 image. You may specify a 
 site-specific T1/T2 image. If the image is not mask, you may specify a mask as well. Otherwise, you may 
-use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_asym_09a_nifti.zip). 
+use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_nifti.zip). 
 
 * NOTE: unzip `mni_icbm152_nlin_asym_09a_nifti.zip` look for
      
