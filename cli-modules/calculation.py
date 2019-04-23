@@ -31,6 +31,7 @@ fixedImaget1= config['TRAINING']['fixedImaget1']
 fixedImaget2= config['TRAINING']['fixedImaget2']
 fixedMaskt1= config['TRAINING']['fixedMaskt1']
 fixedMaskt2= config['TRAINING']['fixedMaskt2']
+excelFile= config['TRAINING']['visual_qc_excel_file']
 # if not fixedMaskt1:
 #     fixedMaskt1 = None
 # if not fixedMaskt2:
@@ -91,7 +92,6 @@ def processImage(imgPath, directory, modality):
 
 def predictQuality(dim, H1, modality, fid):
 
-    excelFile= config['TRAINING']['visual_qc_excel_file']
     subjects, ratings= loadExcel(excelFile, modality)
 
     # load reference histogram file

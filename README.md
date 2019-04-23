@@ -152,8 +152,8 @@ you may need to define [ANTSPATH](https://github.com/ANTsX/ANTs/wiki/Compiling-A
 
 After configuring your environment, you can download provided data and run tests:
 
-    ./cli-modules/structuralQC.py -i ref_data/1001-t1w-xc.nrrd -t t1 --fixedImage mniTemplateT1.nii.gz -o /tmp/
-    ./cli-modules/structuralQC.py -i ref_data/1001-t2w-xc.nrrd -t t2 --fixedImage mniTemplateT2.nii.gz -o /tmp/
+    ./cli-modules/structuralQC.py -i ref_data/1001-t1w-xc.nrrd -t t1 --fixedImg mniTemplateT1.nii.gz -o /tmp/
+    ./cli-modules/structuralQC.py -i ref_data/1001-t2w-xc.nrrd -t t2 --fixedImg mniTemplateT2.nii.gz -o /tmp/
     
 If everything was done well so far, you should see quality score on the `stdout` and corresponding files saved in `/tmp/` 
 with the same name prefix as that of the input structural image.

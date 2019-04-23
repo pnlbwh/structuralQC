@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-VERSION=2.0.2
+VERSION=2.0.4
 
 echo Downloading reference data
 REFDATA=ref_data
