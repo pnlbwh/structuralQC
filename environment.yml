@@ -2,7 +2,7 @@ name: structQC
 
 channels:
     - conda-forge
-    - aramislab
+    - pnlbwh
 
 dependencies:
     - python>=3.0
@@ -14,7 +14,7 @@ dependencies:
     - scipy
     - psutil
     - plumbum
-    - ants=2.2.0
+    - ants
     - conda-build
     - git
     - pip
