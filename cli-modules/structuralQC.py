@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from plumbum import cli
-from calculation import processImage
 from loadFile import loadExecutable, loadExternalCommands
 from errorChecking import EXIT, keyPrompt
 import time, configparser
@@ -79,6 +78,8 @@ class QC(cli.Application):
 
 
         loadExternalCommands()
+        
+        from calculation import processImage
 
         t1= time.time()
         processImage(self.img, self.outDir, self.modality)

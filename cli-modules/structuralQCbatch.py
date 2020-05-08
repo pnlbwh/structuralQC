@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 
 from plumbum import cli
-from batchProcessing import batchProcessing
 from loadFile import loadExecutable, loadExternalCommands, loadCaseList, loadImageList
-from feature_represent import feature_represent
 from errorChecking import EXIT, keyPrompt
 import time
 import configparser
@@ -147,6 +145,9 @@ class batchQC(cli.Application):
         if not isdir(abspath(self.outDir)):
             makedirs(self.outDir)
 
+        
+        from batchProcessing import batchProcessing
+        from feature_represent import feature_represent
 
         t1 = time.time()
         if self.train:
