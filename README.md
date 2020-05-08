@@ -96,6 +96,7 @@ site-specific T1/T2 image. If the image is not mask, you may specify a mask as w
 use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2009/mni_icbm152_nlin_sym_09a_nifti.zip). 
 
 * NOTE: unzip `mni_icbm152_nlin_asym_09a_nifti.zip` look for
+
      
     mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
     mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
@@ -191,7 +192,7 @@ Given a structural image (T1 or T2), the algorithm can predict that as a good or
 
 > ./structuralQC.py -i image.nrrd -t t1 --fixedImage -o /tmp/
 
-You can write a shell script to exploit the above for batch of data. However, you can also use 
+You can write a for loop/shell script to exploit the above for batch of data. However, you can also use 
 [batch processing](#2.-batch-processing) to do it easily.
 
 The program first looks for ansRegistration executables in system path. If they are not available, it exits immediately.
@@ -469,5 +470,5 @@ The above data was not balanced between good and bad images. There might be over
 among sites/raters.
 
 
-So the recommendation is to visually observe images that are given a bad label 
+So the recommendation is to **visually observe** images that are given a **bad** label 
 (because good images have a significant chance of being classified as bad by the algorithm).
