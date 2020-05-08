@@ -66,9 +66,9 @@ def processImage(imgPath, directory, modality):
         print('\'reg\' keyword is not present in input image. Registering with reference image ...')
 
         if modality=='t1':
-            regPath = registration(directory, prefix, fixedImaget1, fixedImaget1, imgPath)
+            regPath = registration(directory, prefix, fixedImaget1, fixedMaskt1, imgPath)
         else:
-            regPath = registration(directory, prefix, fixedImaget2, fixedImaget2, imgPath)
+            regPath = registration(directory, prefix, fixedImaget2, fixedMaskt2, imgPath)
     else:
         regPath= imgPath
         print('Registered image found ...')
