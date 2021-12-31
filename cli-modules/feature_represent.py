@@ -18,7 +18,7 @@ ny = int(config['DEFAULT']['ny'])
 nz = int(config['DEFAULT']['nz'])
 
 POINTS= int(config['DEFAULT']['POINTS'])
-excelFile= config['TRAINING']['visual_qc_excel_file']
+excelFile= config['TRAINING']['train_visual_qc']
 N_CPU= int(config['RESOURCE']['N_CPU'])
 
 def subject_histogram(filepath):
@@ -41,10 +41,10 @@ def feature_represent(imgs, subjects, register, hist, modality, outDir):
     # read the Subject ID and {modality} column
     cases, visual_scores= loadExcel(excelFile, modality)
 
-    errorChecking(subjects, cases)
+    # errorChecking(subjects, cases)
 
     config['TRAINING']['discreteScores']= str(list(set(visual_scores)))
-    config['TRAINING']['visual_qc_excel_file']= excelFile
+    config['TRAINING']['train_visual_qc']= excelFile
 
 
     regImgs= imgs
@@ -110,5 +110,5 @@ def feature_represent(imgs, subjects, register, hist, modality, outDir):
 
 
     # write back the config.ini after everything
-    with open(pjoin(dirname(__file__), '..', 'config.ini'),'w') as f:
+    with open(pjoin(dirname(__file__), 'config.ini'),'w') as f:
         config.write(f)
