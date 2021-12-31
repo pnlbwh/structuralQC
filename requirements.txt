@@ -7,3 +7,6 @@ nibabel
 pynrrd
 psutil
 ipython
+sklearn
+openpyxl
+jupyter
