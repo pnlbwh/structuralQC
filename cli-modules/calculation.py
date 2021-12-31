@@ -31,7 +31,7 @@ fixedImaget1= config['TRAINING']['fixedImaget1']
 fixedImaget2= config['TRAINING']['fixedImaget2']
 fixedMaskt1= config['TRAINING']['fixedMaskt1']
 fixedMaskt2= config['TRAINING']['fixedMaskt2']
-excelFile= config['TRAINING']['visual_qc_excel_file']
+excelFile= config['TRAINING']['train_visual_qc']
 # if not fixedMaskt1:
 #     fixedMaskt1 = None
 # if not fixedMaskt2:
