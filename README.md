@@ -97,10 +97,10 @@ use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2
 
 * NOTE: unzip `mni_icbm152_nlin_asym_09a_nifti.zip` look for
 
-     
-    mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
-    mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
-
+```
+mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
+mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
+```
 
 ## 2. Install QC tool
 
@@ -134,11 +134,10 @@ Make sure the following executables are in your path:
     antsApplyTransforms
     antsRegistrationSyNQuick.sh
     antsRegistration
-    antsRegistrationSyNMI.sh
     
 You can check them as follows:
 
-    which antsRegistrationSyNMI.sh
+    which antsRegistrationSyNQuick.sh
     
 If any of them does not exist, add that to your path:
 
