@@ -36,7 +36,7 @@ Table of Contents
 Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 
-# Structural MRI quality check tool
+# Structural MRI quality checking tool
 
 structuralQC is a machine learning algorithm that predicts a structural mri (T1 or T2)
 as a good or bad image. During acquisition of mri, it might be affected with 
@@ -55,7 +55,7 @@ and predicted as pass/fail.
 
 If you use our software in your research, please cite as below:
 
-Tashrif Billah and Sylvain Bouix, Structural MRI Quality Check Tool, https://github.com/pnlbwh/structuralQC, 
+Tashrif Billah and Sylvain Bouix, Structural MRI Quality Checking Tool, https://github.com/pnlbwh/structuralQC, 
 2018, DOI: 10.5281/zenodo.2584281
 
 
