@@ -38,7 +38,7 @@ Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-mark
 
 # Structural MRI quality checking tool
 
-structuralQC is a machine learning algorithm that predicts a structural mri (T1 or T2)
+*structuralQC* is a machine learning algorithm that predicts a structural mri (T1 or T2)
 as a good or bad image. During acquisition of mri, it might be affected with 
 motion, ghosting, or ringing aritficats. Further processing down any pipeline may be 
 affected by the bad quality of the input image which is why quality assessment is important 
