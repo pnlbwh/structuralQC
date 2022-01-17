@@ -16,7 +16,7 @@ SCRIPTDIR= os.path.abspath(os.path.dirname(__file__))
 config = configparser.ConfigParser()
 config.read(os.path.join(SCRIPTDIR, 'config.ini'))
 discreteScores = ast.literal_eval(config['TRAINING']['discreteScores'])
-excelFile= config['TRAINING']['visual_qc_excel_file']
+excelFile= config['TRAINING']['test_visual_qc']
 N_CPU= int(config['RESOURCE']['N_CPU'])
 
 def resultEvaluation(caselistSubjects, predicted_scores, modality, outDir):

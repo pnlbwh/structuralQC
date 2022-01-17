@@ -7,8 +7,7 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
-   * [Structural MRI quality check tool](#structural-mri-quality-check-tool)
+   * [Structural MRI quality checking tool](#structural-mri-quality-checking-tool)
    * [Citation](#citation)
    * [Dependencies](#dependencies)
    * [Installation](#installation)
@@ -30,15 +29,18 @@ Table of Contents
    * [Advanced options](#advanced-options)
    * [Visual QC](#visual-qc)
    * [Multi threading](#multi-threading)
-   * [Recommendation](#recommendation)
+   * [Discussion](#discussion)
+      * [Data](#data)
+      * [Bootstrapping](#bootstrapping)
+      * [Performance](#performance)
 
 
 Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
 
 
-# Structural MRI quality check tool
+# Structural MRI quality checking tool
 
-structuralQC is a machine learning algorithm that predicts a structural mri (T1 or T2)
+*structuralQC* is a machine learning algorithm that predicts a structural mri (T1 or T2)
 as a good or bad image. During acquisition of mri, it might be affected with 
 motion, ghosting, or ringing aritficats. Further processing down any pipeline may be 
 affected by the bad quality of the input image which is why quality assessment is important 
@@ -51,23 +53,28 @@ histogram representation of the image, it is compared against a library of good 
 and predicted as pass/fail.
 
 
+A demo of this project is available at [structQC.pdf](structQC.pdf)
+
+
 # Citation
 
 If you use our software in your research, please cite as below:
 
-Tashrif Billah and Sylvain Bouix, Structural MRI Quality Check Tool, https://github.com/pnlbwh/structuralQC, 
+Tashrif Billah and Sylvain Bouix, Structural MRI Quality Checking Tool, https://github.com/pnlbwh/structuralQC, 
 2018, DOI: 10.5281/zenodo.2584281
 
 
 # Dependencies
 
-* ANTs = 2.2.0
+* ANTs = 2.3.0
 * numpy
-* scipy
 * nibabel
-* pynrrd
-* plumbum
 * pandas
+* scipy
+* plumbum
+* sklearn
+* pynrrd
+
 
 # Installation
 
@@ -97,10 +104,10 @@ use standard templates such as [MNI](http://www.bic.mni.mcgill.ca/~vfonov/icbm/2
 
 * NOTE: unzip `mni_icbm152_nlin_asym_09a_nifti.zip` look for
 
-     
-    mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
-    mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
-
+```
+mni_icbm152_nlin_sym_09a/mni_icbm152_t1_tal_nlin_sym_09a.nii
+mni_icbm152_nlin_sym_09a/mni_icbm152_t2_tal_nlin_sym_09a.nii
+```
 
 ## 2. Install QC tool
 
@@ -134,11 +141,10 @@ Make sure the following executables are in your path:
     antsApplyTransforms
     antsRegistrationSyNQuick.sh
     antsRegistration
-    antsRegistrationSyNMI.sh
     
 You can check them as follows:
 
-    which antsRegistrationSyNMI.sh
+    which antsRegistrationSyNQuick.sh
     
 If any of them does not exist, add that to your path:
 
@@ -161,6 +167,8 @@ with the same name prefix as that of the input structural image.
 
 
 # Processing
+
+We recommend looking at *Execution* section of [structQC.pdf](structQC.pdf) to learn elaborately about various processing steps. *structQC.pdf* has been updated in 2022.
 
 When it comes to quality checking an MRI, we may want to analyze the quality of one MRI, or more likely, we may want to 
 quality check a batch of data. The *structrualQC* toolbox is provided with both capability requiring less user intervention.
@@ -431,44 +439,40 @@ Batch processing can be multi-threaded with number of cores/processes specified 
 
 Multi threading should enable a faster execution of batch processing.
 
-# Recommendation
+# Discussion
 
-Source:
+### Data
 
-Training image for T1: mindcontrol HBN data
-Training image for T2: DIAGNOSE_CTE_U01 data
-
-Current results:
-
-Detection accuracy of bad images: ~95%
-Detection accuracy of good images: ~70%
-
-Percentage confusion matrix:
-
-T1 images from mindcontrol HBN data
-
-|  | Bad | Good |
-| --- | --- | --- |
-| Bad |  95 | 5 |
-| Good | 47 | 53 |
+This project primarily used DIAGNOSE CTE data. Please see *Data* section of [structQC.pdf](structQC.pdf). It also tested its performace on mindcontrol HBN data.
 
 
-That means there is a significant likelihood that good images fall in the bad bin. But, bad images rarely fall in the
-good bin.
+### Bootstrapping
+
+If the training data are not balanced among good and bad images, predictions might be skewed towards to larger set. To circumvent this obstacle, we have used bootstrapping technique. Please search for *bootstrapping* in [structQC.pdf](structQC.pdf) to know more about it.
 
 
-T2 images from DIAGNOSE_CTE_U01 data
+### Performance
 
+Please search for *observation* in [structQC.pdf](structQC.pdf) to realize the algorithm's performance. In brief, here are two confusion matrices that quantifies quality of prediction for DIAGNOSE CTE images:
+
+* T1w
 
 |  | Bad | Good |
 | --- | --- | --- |
-| Bad |  99 | 1 |
-| Good | 0 | 100 |
+| Bad |  17 | 2 |
+| Good | 0 | 23 |
 
 
-The above data was not balanced between good and bad images. There might be overfitting or inconsistency 
-among sites/raters.
+* T2w
+
+|  | Bad | Good |
+| --- | --- | --- |
+| Bad |  13 | 2 |
+| Good | 0 | 23 |
 
 
-So the recommendation is to **visually observe** images that are given a **bad** label 
-(because good images have a significant chance of being classified as bad by the algorithm).
+Presence of very few off-diagonal elements in the confusion matrices tells us that it mostly correctly predicted the quality of given images. The number of misclassification for both modalities is only two.
+
+
+Additionally, please read the *Discussion* section of [structQC.pdf](structQC.pdf)
+

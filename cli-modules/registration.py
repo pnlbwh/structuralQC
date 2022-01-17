@@ -10,7 +10,7 @@ def registration(directory, prefix, fixedImage, fixedMask, movingImage, threads=
 
     try:
         if not fixedMask:
-            check_call((' ').join(['antsRegistrationSyNMI.sh',
+            check_call((' ').join(['antsRegistrationSyNQuick.sh',
                                    '-d', '3',
                                    '-f', fixedImage,
                                    '-m', movingImage,
@@ -18,7 +18,7 @@ def registration(directory, prefix, fixedImage, fixedMask, movingImage, threads=
                                    '-n', str(threads),
                                    ]), shell = True)
         else:
-            check_call((' ').join(['antsRegistrationSyNMI.sh',
+            check_call((' ').join(['antsRegistrationSyNQuick.sh',
                                    '-d', '3',
                                    '-f', fixedImage,
                                    '-x', fixedMask,

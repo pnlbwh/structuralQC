@@ -116,7 +116,10 @@ class batchQC(cli.Application):
         if self.train and not self.excelFile:
             EXIT('a .xlsx file containing T1 and T2 visual scores is required in training mode')
 
-        config['TRAINING']['visual_qc_excel_file'] = self.excelFile
+        if self.excelFile and self.train:
+            config['TRAINING']['train_visual_qc'] = self.excelFile
+        else:
+            config['TRAINING']['test_visual_qc'] = self.excelFile
 
         if self.N_CPU==-1:
             self.N_CPU= cpu_count()
