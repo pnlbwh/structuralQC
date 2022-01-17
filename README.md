@@ -436,7 +436,36 @@ Batch processing can be multi-threaded with number of cores/processes specified 
 
 Multi threading should enable a faster execution of batch processing.
 
-# Recommendation
+# Discussion
+
+### Data
+
+This project primarily used DIAGNOSE CTE data. Please see *Data* section of [structQC.pdf](structQC.pdf). It also tested its performace on mindcontrol HBN data.
+
+
+### Bootstrapping
+
+If the training data are not balanced among good and bad images, predictions might be skewed towards to larger set. To circumvent this obstacle, we have used bootstrapping technique. Please search for *bootstrapping* in [structQC.pdf](structQC.pdf) to know more about it.
+
+
+### Performance
+
+Please search for *observation* in [structQC.pdf](structQC.pdf) to realize the algorithm's performance. In brief, here are two confusion matrices that quantifies quality of prediction for DIAGNOSE CTE images:
+
+* T1w
+```
+[[17  2]
+ [0  23]]
+```
+
+* T2w
+```
+[[13  2]
+ [0  23]]
+```
+
+Presence of very few off-diagonal elements in the confusion matrices tells us that it mostly correctly predicted the quality of given images. The number of misclassification for both modalities is only two.
+
 
 Source:
 
