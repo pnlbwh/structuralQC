@@ -61,13 +61,15 @@ Tashrif Billah and Sylvain Bouix, Structural MRI Quality Check Tool, https://git
 
 # Dependencies
 
-* ANTs = 2.2.0
+* ANTs = 2.3.0
 * numpy
-* scipy
 * nibabel
-* pynrrd
-* plumbum
 * pandas
+* scipy
+* plumbum
+* sklearn
+* pynrrd
+
 
 # Installation
 
