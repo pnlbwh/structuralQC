@@ -29,7 +29,10 @@ Table of Contents
    * [Advanced options](#advanced-options)
    * [Visual QC](#visual-qc)
    * [Multi threading](#multi-threading)
-   * [Recommendation](#recommendation)
+   * [Discussion](#discussion)
+         * [Data](#data)
+         * [Bootstrapping](#bootstrapping)
+         * [Performance](#performance)
 
 
 Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
