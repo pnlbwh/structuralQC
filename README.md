@@ -7,8 +7,7 @@
 Table of Contents
 =================
 
-   * [Table of Contents](#table-of-contents)
-   * [Structural MRI quality check tool](#structural-mri-quality-check-tool)
+   * [Structural MRI quality checking tool](#structural-mri-quality-checking-tool)
    * [Citation](#citation)
    * [Dependencies](#dependencies)
    * [Installation](#installation)
