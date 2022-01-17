@@ -30,9 +30,9 @@ Table of Contents
    * [Visual QC](#visual-qc)
    * [Multi threading](#multi-threading)
    * [Discussion](#discussion)
-         * [Data](#data)
-         * [Bootstrapping](#bootstrapping)
-         * [Performance](#performance)
+      * [Data](#data)
+      * [Bootstrapping](#bootstrapping)
+      * [Performance](#performance)
 
 
 Table of Contents Created by [gh-md-toc](https://github.com/ekalinin/github-markdown-toc)
