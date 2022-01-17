@@ -51,6 +51,9 @@ histogram representation of the image, it is compared against a library of good 
 and predicted as pass/fail.
 
 
+A demo of this project is available at [structQC.pdf](structQC.pdf)
+
+
 # Citation
 
 If you use our software in your research, please cite as below:
@@ -162,6 +165,8 @@ with the same name prefix as that of the input structural image.
 
 
 # Processing
+
+We recommend looking at *Execution* section of [structQC.pdf](structQC.pdf) to learn elaborately about various processing steps. *structQC.pdf* has been updated in 2022.
 
 When it comes to quality checking an MRI, we may want to analyze the quality of one MRI, or more likely, we may want to 
 quality check a batch of data. The *structrualQC* toolbox is provided with both capability requiring less user intervention.
