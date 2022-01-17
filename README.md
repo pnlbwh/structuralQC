@@ -453,56 +453,23 @@ If the training data are not balanced among good and bad images, predictions mig
 Please search for *observation* in [structQC.pdf](structQC.pdf) to realize the algorithm's performance. In brief, here are two confusion matrices that quantifies quality of prediction for DIAGNOSE CTE images:
 
 * T1w
-```
-[[17  2]
- [0  23]]
-```
+
+|  | Bad | Good |
+| --- | --- | --- |
+| Bad |  17 | 2 |
+| Good | 0 | 23 |
+
 
 * T2w
-```
-[[13  2]
- [0  23]]
-```
+
+|  | Bad | Good |
+| --- | --- | --- |
+| Bad |  13 | 2 |
+| Good | 0 | 23 |
+
 
 Presence of very few off-diagonal elements in the confusion matrices tells us that it mostly correctly predicted the quality of given images. The number of misclassification for both modalities is only two.
 
 
-Source:
+Additionally, please read the *Discussion* section of [structQC.pdf](structQC.pdf)
 
-Training image for T1: mindcontrol HBN data
-Training image for T2: DIAGNOSE_CTE_U01 data
-
-Current results:
-
-Detection accuracy of bad images: ~95%
-Detection accuracy of good images: ~70%
-
-Percentage confusion matrix:
-
-T1 images from mindcontrol HBN data
-
-|  | Bad | Good |
-| --- | --- | --- |
-| Bad |  95 | 5 |
-| Good | 47 | 53 |
-
-
-That means there is a significant likelihood that good images fall in the bad bin. But, bad images rarely fall in the
-good bin.
-
-
-T2 images from DIAGNOSE_CTE_U01 data
-
-
-|  | Bad | Good |
-| --- | --- | --- |
-| Bad |  99 | 1 |
-| Good | 0 | 100 |
-
-
-The above data was not balanced between good and bad images. There might be overfitting or inconsistency 
-among sites/raters.
-
-
-So the recommendation is to **visually observe** images that are given a **bad** label 
-(because good images have a significant chance of being classified as bad by the algorithm).
