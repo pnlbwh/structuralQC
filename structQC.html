@@ -9475,8 +9475,8 @@ Visual discrete scores are:  [1, 2, 3, 4]
 <div class="jp-InputArea jp-Cell-inputArea"><div class="jp-InputPrompt jp-InputArea-prompt">
 </div><div class="jp-RenderedHTMLCommon jp-RenderedMarkdown jp-MarkdownOutput" data-mime-type="text/markdown">
 <h2 id="Future-work">Future work<a class="anchor-link" href="#Future-work">¶</a></h2><h3 id="Furnish-bootstrapping">Furnish bootstrapping<a class="anchor-link" href="#Furnish-bootstrapping">¶</a></h3><p>Currently, bootstrapping has been applied at the whole data level. Bootstrapping is synonymous to data duplication. So, there may be some samples that exist in both training and testing sets. Algorithmically, existence of a few train samples in the test set does not affect the outcome at all. But in future, we plan to write complex code that will apply bootstrapping to the train set only.</p>
-<h3 id="Use-ROC-AUC">Use ROC AUC<a class="anchor-link" href="#Use-ROC-AUC">¶</a></h3><p>In the above, we care more about pass/fail decision than the actual rating of the MRI (1,2 are fail while 3,4 are pass). Thus we have some buffer in evaluating performance of the algorithm. In such case, we can calculate probability of an MRI being a rating. Instead of hard assignment of a rating <code>[1,2,3,4]</code>, we can calculate probability as a four element array e.g. <code>[0.1,0.2,0.5,0.2]</code>. Such probabilities would allow AUC calculation from an ROC curve. We intend to use this metric in future.</p>
-<h3 id="Mask-MRIs">Mask MRIs<a class="anchor-link" href="#Mask-MRIs">¶</a></h3><p>A significant portion of the MRI is background i.e. black region around the brain. When comparing similarity between two MRIs, we should not need to consider that background. If we could extract the brain from an MRI, then the background would reduce to zero. The zero features should increase efficiency of calculation. In future, we shall look for a good brain extraction tool intrisically in Python that could be used conveniently in the above terminal.</p>
+<h3 id="Use-ROC-AUC">Use ROC AUC<a class="anchor-link" href="#Use-ROC-AUC">¶</a></h3><p>In the above, we care more about pass/fail decision than the actual rating of the MRI (1,2 are fail while 3,4 are pass). Thus we have some leeway in evaluating performance of the algorithm. As another metric, we can calculate probability of an MRI being a rating. Instead of hard assignment of a rating <code>[1,2,3,4]</code>, we can calculate probability as a four element array e.g. <code>[0.1,0.2,0.5,0.2]</code>. Such probabilities would allow AUC calculation from an ROC curve. We intend to use this metric in future.</p>
+<h3 id="Mask-MRIs">Mask MRIs<a class="anchor-link" href="#Mask-MRIs">¶</a></h3><p>A significant portion of the MRI is background i.e. black region around the brain. When comparing similarity between two MRIs, we should not need to consider that background. If we could extract the brain from an MRI, then the background would reduce to zero. The zero features should increase efficiency of calculation. In future, we shall look for a good brain extraction tool intrinsically in Python that could be used conveniently in the above terminal.</p>
 </div>
 </div>
 </div>
@@ -9561,6 +9561,20 @@ as follows:</p>
 <p>Make sure to properly write the header:</p>
 <pre><code>| Subject ID | t1 score | t2 score |</code></pre>
 <p>The caseids in the caselist should be same as the ones used under Subject ID column in the excel file.</p>
+</div>
+</div>
+</div>
+</div><div class="jp-Cell jp-CodeCell jp-Notebook-cell jp-mod-noOutputs" id="cell-id=ea3ebb87-930c-48a6-9167-d0fe08589396">
+<div class="jp-Cell-inputWrapper" tabindex="0">
+<div class="jp-Collapser jp-InputCollapser jp-Cell-inputCollapser">
+</div>
+<div class="jp-InputArea jp-Cell-inputArea">
+<div class="jp-InputPrompt jp-InputArea-prompt">In [ ]:</div>
+<div class="jp-CodeMirrorEditor jp-Editor jp-InputArea-editor" data-type="inline">
+<div class="cm-editor cm-s-jupyter">
+<div class="highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+</div>
 </div>
 </div>
 </div>
