@@ -16,7 +16,7 @@ dependencies:
     - plumbum
     - ants
     - conda-build
-    - sklearn
+    - scikit-learn
     - openpyxl
     - jupyter
     - git
