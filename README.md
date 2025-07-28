@@ -53,7 +53,7 @@ histogram representation of the image, it is compared against a library of good 
 and predicted as pass/fail.
 
 
-A demo of this project is available at [structQC.pdf](structQC.pdf)
+A demo of this project is available at [structQC.ipynb](structQC.ipynb)
 
 
 # Citation
@@ -168,7 +168,7 @@ with the same name prefix as that of the input structural image.
 
 # Processing
 
-We recommend looking at *Execution* section of [structQC.pdf](structQC.pdf) to learn elaborately about various processing steps. *structQC.pdf* has been updated in 2022.
+We recommend looking at *Execution* section of [structQC.ipynb](structQC.ipynb) to learn elaborately about various processing steps. *structQC.ipynb* has been updated in 2022.
 
 When it comes to quality checking an MRI, we may want to analyze the quality of one MRI, or more likely, we may want to 
 quality check a batch of data. The *structrualQC* toolbox is provided with both capability requiring less user intervention.
@@ -443,17 +443,17 @@ Multi threading should enable a faster execution of batch processing.
 
 ### Data
 
-This project primarily used DIAGNOSE CTE data. Please see *Data* section of [structQC.pdf](structQC.pdf). It also tested its performace on mindcontrol HBN data.
+This project primarily used DIAGNOSE CTE data. Please see *Data* section of [structQC.ipynb](structQC.ipynb). It also tested its performace on mindcontrol HBN data.
 
 
 ### Bootstrapping
 
-If the training data are not balanced among good and bad images, predictions might be skewed towards to larger set. To circumvent this obstacle, we have used bootstrapping technique. Please search for *bootstrapping* in [structQC.pdf](structQC.pdf) to know more about it.
+If the training data are not balanced among good and bad images, predictions might be skewed towards to larger set. To circumvent this obstacle, we have used bootstrapping technique. Please search for *bootstrapping* in [structQC.ipynb](structQC.ipynb) to know more about it.
 
 
 ### Performance
 
-Please search for *observation* in [structQC.pdf](structQC.pdf) to realize the algorithm's performance. In brief, here are two confusion matrices that quantifies quality of prediction for DIAGNOSE CTE images:
+Please search for *observation* in [structQC.ipynb](structQC.ipynb) to realize the algorithm's performance. In brief, here are two confusion matrices that quantifies quality of prediction for DIAGNOSE CTE images:
 
 * T1w
 
@@ -474,5 +474,5 @@ Please search for *observation* in [structQC.pdf](structQC.pdf) to realize the a
 Presence of very few off-diagonal elements in the confusion matrices tells us that it mostly correctly predicted the quality of given images. The number of misclassification for both modalities is only two.
 
 
-Additionally, please read the *Discussion* section of [structQC.pdf](structQC.pdf)
+Additionally, please read the *Discussion* section of [structQC.ipynb](structQC.ipynb)
 
