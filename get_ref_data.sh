@@ -6,8 +6,8 @@ __version__=`echo $v | xargs`
 
 echo Downloading reference data
 REFDATA=ref_data
-wget reference_data/ https://github.com/pnlbwh/structuralQC/releases/download/v${__version__}/$REFDATA.zip
-tar -xzvf $REFDATA.zip
+wget https://github.com/pnlbwh/structuralQC/releases/download/v${__version__}/$REFDATA.zip
+tar -xzvf $REFDATA.tar.gz
 
 # get script directory
 SCRIPT=$(readlink -m $(type -p $0))
