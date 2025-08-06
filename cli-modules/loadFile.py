@@ -14,7 +14,7 @@ def loadNrrd(fileName):
 
 def loadNifti(fileName):
     img = nibabel.load(fileName)
-    return img.get_data()
+    return img.get_fdata()
 
 def loadImage(filePath):
 
